@@ -20,13 +20,12 @@ public class TypeResolver
     private ResolvedType GetEnumerableParameterTypeName(Type genericType, ParameterInfo param)
     {
         var resolvedGenericType = GetTypeName(genericType, param.IsNullable(true));
-        var isNullable = param.IsNullable();
 
-        var resolvedType = new ResolvedType(param.ParameterType)
+        var resolvedType = new ResolvedType(param.ParameterType, param.ParameterType.Namespace!)
         {
             GenericArgumentType = resolvedGenericType,
             IsEnumerable = true,
-            IsNullable = isNullable
+            IsNullable = param.IsNullable()
         };
 
         return resolvedType;
@@ -34,7 +33,16 @@ public class TypeResolver
 
     private ResolvedType GetTypeName(Type type, bool isNullable)
     {
-        return new ResolvedType(type)
+        var namespaces = new List<string> { type.Namespace! };
+
+        if (isNullable)
+        {
+            var arg = type.GetGenericArguments().SingleOrDefault();
+            if (arg is not null)
+                namespaces.Add(arg.Namespace!);
+        }
+
+        return new ResolvedType(type, namespaces)
         {
             IsNullable = isNullable
         };

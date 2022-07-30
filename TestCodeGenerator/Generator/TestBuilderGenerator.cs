@@ -1,6 +1,7 @@
 ﻿using Generator.Extensions;
 using Generator.Files;
 using System.Reflection;
+using System.Text;
 
 namespace Generator;
 
@@ -8,6 +9,7 @@ public class TestBuilderGenerator
 {
     private readonly IFileHandler _fileHandler;
     private readonly TypeResolver _typeResolver;
+    private readonly HashSet<string> _namespaces = new();
 
     public TestBuilderGenerator(IFileHandler fileHandler, TypeResolver typeResolver)
     {
@@ -45,8 +47,9 @@ public class TestBuilderGenerator
     {
         var builderClassName = $"{type.Name}Builder";
 
-        var src = $@" // Auto-generated code
-using System;
+        var contentBuilder = new StringBuilder();
+
+        contentBuilder.Append($@"
 
 namespace {type.Namespace}.Test;
 
@@ -54,8 +57,13 @@ public class {builderClassName} : DomainTestBuilderBase<{type.Name}>
 {{
     {GetMethods(type, builderClassName)}
 }}
-";
-        return src;
+");
+        foreach (var nmsp in _namespaces.OrderByDescending(nmsp => nmsp))
+        {
+            contentBuilder.Insert(0, $"using {nmsp};{Environment.NewLine}");
+        }
+
+        return contentBuilder.ToString();
     }
 
     private string GetMethods(Type type, string builderClassName)
@@ -83,6 +91,7 @@ public class {builderClassName} : DomainTestBuilderBase<{type.Name}>
     private string GetParameterMethods(ParameterInfo param, string builderClassName)
     {
         var resolvedType = _typeResolver.Resolve(param);
+        AddNamespaces(resolvedType.GetAllNamespaces());
 
         if (resolvedType.IsEnumerable)
         {
@@ -129,7 +138,25 @@ public class {builderClassName} : DomainTestBuilderBase<{type.Name}>
         return With{capitalizedName}(Enumerable.Empty<{resolvedType.GenericArgumentType.GetFullName()}>());
     }}";
 
+        if (resolvedType.IsNullable)
+        {
+            src += $@"{Environment.NewLine}
+    public {builderClassName} Without{capitalizedName}()
+    {{
+        return With{capitalizedName}(null);
+    }}";
+        }
+
         return src;
+    }
+
+    private void AddNamespaces(IEnumerable<string> namespaces)
+    {
+        foreach (var namesp in namespaces)
+        {
+            if (!_namespaces.Contains(namesp))
+                _namespaces.Add(namesp);
+        }
     }
 
     private string CapitalizeFirstLetter(string name)

@@ -4,10 +4,23 @@ namespace Generator;
 
 public class ResolvedType
 {
-    public ResolvedType(Type originalType, ResolvedType? genericArgumentType = null, bool isNullable = false,
-        bool isEnumerable = false)
+    private readonly IReadOnlyCollection<string> _namespaces;
+
+    public ResolvedType(Type originalType, string nameSpace, ResolvedType? genericArgumentType = null,
+        bool isNullable = false, bool isEnumerable = false)
     {
         OriginalType = originalType;
+        _namespaces = new List<string> { nameSpace };
+        GenericArgumentType = genericArgumentType;
+        IsNullable = isNullable;
+        IsEnumerable = isEnumerable;
+    }
+
+    public ResolvedType(Type originalType, IEnumerable<string> namespaces, ResolvedType? genericArgumentType = null,
+        bool isNullable = false, bool isEnumerable = false)
+    {
+        OriginalType = originalType;
+        _namespaces = namespaces.ToList();
         GenericArgumentType = genericArgumentType;
         IsNullable = isNullable;
         IsEnumerable = isEnumerable;
@@ -46,6 +59,14 @@ public class ResolvedType
             nameBuilder.Append('?');
 
         return nameBuilder.ToString();
+    }
+
+    public IEnumerable<string> GetAllNamespaces()
+    {
+        if (GenericArgumentType is null)
+            return _namespaces;
+
+        return _namespaces.Union(GenericArgumentType.GetAllNamespaces());
     }
 
     private static string? ResolveTypeName(Type? type)
