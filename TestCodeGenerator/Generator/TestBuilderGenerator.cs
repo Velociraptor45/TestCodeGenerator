@@ -1,4 +1,5 @@
-﻿using Generator.Extensions;
+﻿using Generator.Configurations;
+using Generator.Extensions;
 using Generator.Files;
 using System.Reflection;
 using System.Text;
@@ -9,38 +10,35 @@ public class TestBuilderGenerator
 {
     private readonly IFileHandler _fileHandler;
     private readonly TypeResolver _typeResolver;
+    private readonly BuilderConfiguration _config;
     private readonly HashSet<string> _namespaces = new();
 
-    public TestBuilderGenerator(IFileHandler fileHandler, TypeResolver typeResolver)
+    public TestBuilderGenerator(IFileHandler fileHandler, TypeResolver typeResolver, BuilderConfiguration config)
     {
         _fileHandler = fileHandler;
         _typeResolver = typeResolver;
+        _config = config;
     }
 
-    public void Generate(string dllPath, string typeName, string outputFolder)
+    public void Generate(string typeName)
     {
-        try
-        {
-            var bytes = _fileHandler.LoadDll(dllPath);
-            var assembly = Assembly.Load(bytes);
+        _namespaces.Add(_config.GenericSuperclassNamespace);
 
-            var types = assembly.GetTypes().Where(t => t.Name == typeName).ToList();
+        var bytes = _fileHandler.LoadDll(_config.DllPath);
+        var assembly = Assembly.Load(bytes);
 
-            if (types.Count == 0)
-                throw new Exception($"No class with type name {typeName} found");
-            if (types.Count > 1)
-                throw new Exception($"More than one class with type name {typeName} found");
+        var types = assembly.GetTypes().Where(t => t.Name == typeName).ToList();
 
-            var type = types.Single();
+        if (types.Count == 0)
+            throw new Exception($"No class with type name {typeName} found");
+        if (types.Count > 1)
+            throw new Exception($"More than one class with type name {typeName} found. Further distinction is currently not implemented");
 
-            var content = GetContent(type);
+        var type = types.Single();
 
-            _fileHandler.CreateFile(Path.Combine(outputFolder, $"{type.Name}Builder.cs"), content);
-        }
-        catch (Exception e)
-        {
-            throw;
-        }
+        var content = GetContent(type);
+
+        _fileHandler.CreateFile(Path.Combine(_config.OutputFolder, $"{type.Name}Builder.cs"), content);
     }
 
     private string GetContent(Type type)
@@ -50,10 +48,9 @@ public class TestBuilderGenerator
         var contentBuilder = new StringBuilder();
 
         contentBuilder.Append($@"
+namespace {GetBuilderClassNamespace(type)};
 
-namespace {type.Namespace}.Test;
-
-public class {builderClassName} : DomainTestBuilderBase<{type.Name}>
+public class {builderClassName} : {_config.GenericSuperclassTypeName}<{type.Name}>
 {{
     {GetMethods(type, builderClassName)}
 }}
@@ -64,6 +61,22 @@ public class {builderClassName} : DomainTestBuilderBase<{type.Name}>
         }
 
         return contentBuilder.ToString();
+    }
+
+    private string GetBuilderClassNamespace(Type type)
+    {
+        var rootNamespace = _config.OutputAssemblyRootNamespace;
+        var typeNamespace = type.Namespace!;
+
+        for (int i = 0; i < _config.OutputAssemblyRootNamespace.Length; i++)
+        {
+            if (rootNamespace[i] == typeNamespace[i])
+                continue;
+
+            return $"{rootNamespace}.{typeNamespace[i..]}";
+        }
+
+        throw new InvalidOperationException("Namespace detection failed. Debug me");
     }
 
     private string GetMethods(Type type, string builderClassName)
@@ -107,7 +120,7 @@ public class {builderClassName} : DomainTestBuilderBase<{type.Name}>
 
         var src = @$"public {builderClassName} With{capitalizedName}({resolvedType.GetFullName()} {param.Name})
     {{
-        FillConstructorWith(nameof({param.Name}), {param.Name});
+        {_config.CtorInjectionMethodName}(nameof({param.Name}), {param.Name});
         return this;
     }}";
 
@@ -131,7 +144,7 @@ public class {builderClassName} : DomainTestBuilderBase<{type.Name}>
 
         contentBuilder.Append(@$"public {builderClassName} With{capitalizedName}({resolvedType.GetFullName()} {param.Name})
     {{
-        FillConstructorWith(nameof({param.Name}), {param.Name});
+        {_config.CtorInjectionMethodName}(nameof({param.Name}), {param.Name});
         return this;
     }}");
 

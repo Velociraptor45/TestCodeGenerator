@@ -53,7 +53,7 @@ public class ResolvedType
                 argName = ResolveTypeName(arg);
             }
 
-            argName ??= OriginalType.Name;
+            argName ??= ResolveTypeName(OriginalType);
 
             nameBuilder.Append(argName);
         }
