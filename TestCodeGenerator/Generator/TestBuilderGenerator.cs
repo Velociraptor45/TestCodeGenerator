@@ -93,7 +93,7 @@ public class {builderClassName} : DomainTestBuilderBase<{type.Name}>
         var resolvedType = _typeResolver.Resolve(param);
         AddNamespaces(resolvedType.GetAllNamespaces());
 
-        if (resolvedType.IsEnumerable)
+        if (resolvedType.IsOrImplementsEnumerable)
         {
             return GetEnumerableParameterMethods(param, resolvedType, builderClassName);
         }
@@ -125,29 +125,57 @@ public class {builderClassName} : DomainTestBuilderBase<{type.Name}>
 
     private string GetEnumerableParameterMethods(ParameterInfo param, ResolvedType resolvedType, string builderClassName)
     {
+        var contentBuilder = new StringBuilder();
         var capitalizedName = CapitalizeFirstLetter(param.Name!);
+        var emptyEnumerableInitialization = GetInitializationOfEmptyEnumerable(resolvedType);
 
-        var src = @$"public {builderClassName} With{capitalizedName}({resolvedType.GetFullName()} {param.Name})
+        contentBuilder.Append(@$"public {builderClassName} With{capitalizedName}({resolvedType.GetFullName()} {param.Name})
     {{
         FillConstructorWith(nameof({param.Name}), {param.Name});
         return this;
-    }}
+    }}");
 
+        if (emptyEnumerableInitialization is not null)
+        {
+            contentBuilder.Append(@$"{Environment.NewLine}
     public {builderClassName} WithEmpty{capitalizedName}()
     {{
-        return With{capitalizedName}(Enumerable.Empty<{resolvedType.GenericArgumentType.GetFullName()}>());
-    }}";
+        return With{capitalizedName}({emptyEnumerableInitialization});
+    }}");
+        }
 
         if (resolvedType.IsNullable)
         {
-            src += $@"{Environment.NewLine}
+            contentBuilder.Append($@"{Environment.NewLine}
     public {builderClassName} Without{capitalizedName}()
     {{
         return With{capitalizedName}(null);
-    }}";
+    }}");
         }
 
-        return src;
+        return contentBuilder.ToString();
+    }
+
+    private string? GetInitializationOfEmptyEnumerable(ResolvedType resolvedType)
+    {
+        if (!resolvedType.IsOrImplementsEnumerable)
+            throw new InvalidOperationException(
+                "Cannot create statement for enumerable initialization when type doesn't implement IEnumerable");
+
+        if (resolvedType.IsGeneric)
+        {
+            // todo: distinguish between List, Dictionary, IEnumerable, etc.
+            return $"Enumerable.Empty<{resolvedType.GenericArgumentType!.GetFullName()}>()";
+        }
+
+        if (resolvedType.OriginalType.GetConstructors().All(c => c.GetParameters().Any()))
+        {
+            Console.WriteLine(
+                $"No standard ctor found for type {resolvedType.OriginalType.Name}. Skipping 'WithEmpty' method");
+            return null;
+        }
+
+        return $"new {resolvedType.OriginalType.Name}()";
     }
 
     private void AddNamespaces(IEnumerable<string> namespaces)

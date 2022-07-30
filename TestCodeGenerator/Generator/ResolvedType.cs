@@ -13,7 +13,7 @@ public class ResolvedType
         _namespaces = new List<string> { nameSpace };
         GenericArgumentType = genericArgumentType;
         IsNullable = isNullable;
-        IsEnumerable = isEnumerable;
+        IsOrImplementsEnumerable = isEnumerable;
     }
 
     public ResolvedType(Type originalType, IEnumerable<string> namespaces, ResolvedType? genericArgumentType = null,
@@ -23,12 +23,12 @@ public class ResolvedType
         _namespaces = namespaces.ToList();
         GenericArgumentType = genericArgumentType;
         IsNullable = isNullable;
-        IsEnumerable = isEnumerable;
+        IsOrImplementsEnumerable = isEnumerable;
     }
 
     public Type OriginalType { get; }
     public ResolvedType? GenericArgumentType { get; init; }
-    public bool IsEnumerable { get; init; }
+    public bool IsOrImplementsEnumerable { get; init; }
     public bool IsNullable { get; init; }
     public bool IsGeneric => GenericArgumentType is not null;
 
@@ -36,9 +36,12 @@ public class ResolvedType
     {
         var nameBuilder = new StringBuilder();
 
-        if (IsEnumerable)
+        if (IsOrImplementsEnumerable)
         {
-            nameBuilder.Append($"{OriginalType.Name[..^2]}<{GenericArgumentType.GetFullName()}>");
+            if (IsGeneric)
+                nameBuilder.Append($"{OriginalType.Name[..^2]}<{GenericArgumentType.GetFullName()}>");
+            else
+                nameBuilder.Append($"{OriginalType.Name}");
         }
         else
         {

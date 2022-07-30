@@ -7,24 +7,24 @@ public class TypeResolver
 {
     public ResolvedType Resolve(ParameterInfo param)
     {
-        var enumerableType = GetEnumerableType(param.ParameterType);
+        var enumerableReport = AnalyzeForEnumerable(param.ParameterType);
 
-        if (enumerableType is not null)
+        if (enumerableReport.IsEnumerable)
         {
-            return GetEnumerableParameterTypeName(enumerableType, param);
+            return GetEnumerableParameterTypeName(enumerableReport, param);
         }
 
         return GetTypeName(param.ParameterType, param.IsNullable(true));
     }
 
-    private ResolvedType GetEnumerableParameterTypeName(Type genericType, ParameterInfo param)
+    private ResolvedType GetEnumerableParameterTypeName(EnumerableReport enumerableReport, ParameterInfo param)
     {
-        var resolvedGenericType = GetTypeName(genericType, param.IsNullable(true));
+        var resolvedGenericType = GetTypeName(enumerableReport.GenericArgumentType!, param.IsNullable(true));
 
         var resolvedType = new ResolvedType(param.ParameterType, param.ParameterType.Namespace!)
         {
-            GenericArgumentType = resolvedGenericType,
-            IsEnumerable = true,
+            GenericArgumentType = enumerableReport.IsActualTypeGeneric ? resolvedGenericType : null,
+            IsOrImplementsEnumerable = true,
             IsNullable = param.IsNullable()
         };
 
@@ -48,21 +48,22 @@ public class TypeResolver
         };
     }
 
-    private Type? GetEnumerableType(Type type)
+    private EnumerableReport AnalyzeForEnumerable(Type type)
     {
         if (type == typeof(string))
-            return null;
+            return EnumerableReport.NoEnumerable(type);
 
         if (type.IsInterface && type.GetGenericTypeDefinition() == typeof(IEnumerable<>))
-            return type.GetGenericArguments()[0];
+            return new EnumerableReport(type, true, true, false, type.GetGenericArguments()[0]);
+
         foreach (Type intType in type.GetInterfaces())
         {
             if (intType.IsGenericType
                 && intType.GetGenericTypeDefinition() == typeof(IEnumerable<>))
             {
-                return intType.GetGenericArguments()[0];
+                return new EnumerableReport(type, true, type.IsGenericType, true, intType.GetGenericArguments()[0]);
             }
         }
-        return null;
+        return EnumerableReport.NoEnumerable(type);
     }
 }
