@@ -1,4 +1,4 @@
-﻿namespace Generator.Configurations;
+﻿namespace TestCodeGenerator.Generator.Configurations;
 
 public class BuilderConfiguration
 {

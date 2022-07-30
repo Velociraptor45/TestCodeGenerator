@@ -1,10 +1,11 @@
-﻿using Generator.Configurations;
-using Generator.Extensions;
-using Generator.Files;
-using System.Reflection;
+﻿using System.Reflection;
 using System.Text;
+using TestCodeGenerator.Generator.Configurations;
+using TestCodeGenerator.Generator.Extensions;
+using TestCodeGenerator.Generator.Files;
+using TestCodeGenerator.Generator.Services;
 
-namespace Generator;
+namespace TestCodeGenerator.Generator.Generators;
 
 public class TestBuilderGenerator
 {
@@ -30,9 +31,9 @@ public class TestBuilderGenerator
         var types = assembly.GetTypes().Where(t => t.Name == typeName).ToList();
 
         if (types.Count == 0)
-            throw new Exception($"No class with type name {typeName} found");
+            throw new ArgumentException($"No class with type name '{typeName}' found", nameof(typeName));
         if (types.Count > 1)
-            throw new Exception($"More than one class with type name {typeName} found. Further distinction is currently not implemented");
+            throw new ArgumentException($"More than one class with type name '{typeName}' found. Further distinction is currently not implemented", nameof(typeName));
 
         var type = types.Single();
 
@@ -95,78 +96,82 @@ public class {builderClassName} : {_config.GenericSuperclassTypeName}<{type.Name
             }
         }
 
-        var methods = parameters.Values.Select(p => GetParameterMethods(p, builderClassName));
+        var methods = parameters.Values.Select(p => BuildMethod(p, builderClassName));
 
         return string.Join($@"{Environment.NewLine}
     ", methods);
     }
 
-    private string GetParameterMethods(ParameterInfo param, string builderClassName)
+    private string BuildMethod(ParameterInfo param, string builderClassName)
     {
         var resolvedType = _typeResolver.Resolve(param);
         AddNamespaces(resolvedType.GetAllNamespaces());
 
         if (resolvedType.IsOrImplementsEnumerable)
         {
-            return GetEnumerableParameterMethods(param, resolvedType, builderClassName);
+            return BuildEnumerableParameterMethods(param, resolvedType, builderClassName);
         }
 
-        return GetParameterMethod(param, resolvedType, builderClassName);
+        return BuildMethod(param, resolvedType, builderClassName);
     }
 
-    private string GetParameterMethod(ParameterInfo param, ResolvedType resolvedType, string builderClassName)
+    private string BuildMethod(ParameterInfo param, ResolvedType resolvedType, string builderClassName)
     {
+        var strBuilder = new StringBuilder();
         var capitalizedName = CapitalizeFirstLetter(param.Name!);
 
-        var src = @$"public {builderClassName} With{capitalizedName}({resolvedType.GetFullName()} {param.Name})
-    {{
-        {_config.CtorInjectionMethodName}(nameof({param.Name}), {param.Name});
-        return this;
-    }}";
-
-        if (param.IsNullable())
-        {
-            src += @$"{Environment.NewLine}
-    public {builderClassName} Without{capitalizedName}()
-    {{
-        return With{capitalizedName}(null);
-    }}";
-        }
-
-        return src;
-    }
-
-    private string GetEnumerableParameterMethods(ParameterInfo param, ResolvedType resolvedType, string builderClassName)
-    {
-        var contentBuilder = new StringBuilder();
-        var capitalizedName = CapitalizeFirstLetter(param.Name!);
-        var emptyEnumerableInitialization = GetInitializationOfEmptyEnumerable(resolvedType);
-
-        contentBuilder.Append(@$"public {builderClassName} With{capitalizedName}({resolvedType.GetFullName()} {param.Name})
+        strBuilder.Append(@$"public {builderClassName} With{capitalizedName}({resolvedType.GetFullName()} {param.Name})
     {{
         {_config.CtorInjectionMethodName}(nameof({param.Name}), {param.Name});
         return this;
     }}");
 
+        if (param.IsNullable())
+        {
+            strBuilder.Append(@$"{Environment.NewLine}
+    public {builderClassName} Without{capitalizedName}()
+    {{
+        return With{capitalizedName}(null);
+    }}");
+        }
+
+        return strBuilder.ToString();
+    }
+
+    private string BuildEnumerableParameterMethods(ParameterInfo param, ResolvedType resolvedType, string builderClassName)
+    {
+        var strBuilder = new StringBuilder();
+        var capitalizedName = CapitalizeFirstLetter(param.Name!);
+        var emptyEnumerableInitialization = GetInitializationOfEmptyEnumerable(resolvedType);
+
+        // With
+        strBuilder.Append(@$"public {builderClassName} With{capitalizedName}({resolvedType.GetFullName()} {param.Name})
+    {{
+        {_config.CtorInjectionMethodName}(nameof({param.Name}), {param.Name});
+        return this;
+    }}");
+
+        // WithEmpty
         if (emptyEnumerableInitialization is not null)
         {
-            contentBuilder.Append(@$"{Environment.NewLine}
+            strBuilder.Append(@$"{Environment.NewLine}
     public {builderClassName} WithEmpty{capitalizedName}()
     {{
         return With{capitalizedName}({emptyEnumerableInitialization});
     }}");
         }
 
+        // Without
         if (resolvedType.IsNullable)
         {
-            contentBuilder.Append($@"{Environment.NewLine}
+            strBuilder.Append($@"{Environment.NewLine}
     public {builderClassName} Without{capitalizedName}()
     {{
         return With{capitalizedName}(null);
     }}");
         }
 
-        return contentBuilder.ToString();
+        return strBuilder.ToString();
     }
 
     private string? GetInitializationOfEmptyEnumerable(ResolvedType resolvedType)
@@ -193,10 +198,10 @@ public class {builderClassName} : {_config.GenericSuperclassTypeName}<{type.Name
 
     private void AddNamespaces(IEnumerable<string> namespaces)
     {
-        foreach (var namesp in namespaces)
+        foreach (var nmsp in namespaces)
         {
-            if (!_namespaces.Contains(namesp))
-                _namespaces.Add(namesp);
+            if (!_namespaces.Contains(nmsp))
+                _namespaces.Add(nmsp);
         }
     }
 

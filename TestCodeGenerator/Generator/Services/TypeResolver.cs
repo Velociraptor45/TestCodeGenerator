@@ -1,7 +1,7 @@
-﻿using Generator.Extensions;
-using System.Reflection;
+﻿using System.Reflection;
+using TestCodeGenerator.Generator.Extensions;
 
-namespace Generator;
+namespace TestCodeGenerator.Generator.Services;
 
 public class TypeResolver
 {

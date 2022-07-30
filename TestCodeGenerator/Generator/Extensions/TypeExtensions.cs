@@ -1,6 +1,6 @@
 ﻿using System.Reflection;
 
-namespace Generator.Extensions;
+namespace TestCodeGenerator.Generator.Extensions;
 
 public static class TypeExtensions
 {
@@ -8,8 +8,6 @@ public static class TypeExtensions
     {
         var isNullabilityType = param.ParameterType.IsGenericType
             && param.ParameterType.GetGenericTypeDefinition().Equals(typeof(Nullable<>));
-
-        //return isNullabilityType;
 
         if (isNullabilityType)
             return true;

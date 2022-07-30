@@ -1,4 +1,4 @@
-﻿namespace Generator.Files;
+﻿namespace TestCodeGenerator.Generator.Files;
 
 public interface IFileHandler
 {

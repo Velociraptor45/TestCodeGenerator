@@ -1,6 +1,16 @@
-﻿using Generator;
-using Generator.Configurations;
-using Generator.Files;
+﻿using Microsoft.Extensions.Configuration;
+using TestCodeGenerator.Generator.Configurations;
+using TestCodeGenerator.Generator.Files;
+using TestCodeGenerator.Generator.Generators;
+using TestCodeGenerator.Generator.Services;
+
+var appsettingsName = "";
+
+var cfg = new ConfigurationBuilder()
+            .SetBasePath(Directory.GetCurrentDirectory())
+            .AddJsonFile($"appsettings.{appsettingsName}.json",
+                optional: false, reloadOnChange: false)
+            .Build();
 
 var config = new BuilderConfiguration
 {
@@ -14,9 +24,3 @@ var config = new BuilderConfiguration
 
 new TestBuilderGenerator(new FileHandler(), new TypeResolver(), config)
     .Generate("Item");
-
-/*
- * todo:
- * - output namespace
- * - detect diff to existing builder file
- */

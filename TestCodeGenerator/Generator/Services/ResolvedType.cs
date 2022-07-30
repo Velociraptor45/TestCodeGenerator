@@ -1,6 +1,6 @@
 ﻿using System.Text;
 
-namespace Generator;
+namespace TestCodeGenerator.Generator.Services;
 
 public class ResolvedType
 {
