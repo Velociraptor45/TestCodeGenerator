@@ -2,6 +2,7 @@
 
 public class BuilderConfiguration
 {
+    public string Name { get; init; } = string.Empty;
     public string DllPath { get; init; } = string.Empty;
     public string OutputFolder { get; init; } = string.Empty;
     public string GenericSuperclassTypeName { get; init; } = string.Empty;

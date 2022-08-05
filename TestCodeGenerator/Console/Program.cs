@@ -1,26 +1,34 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using CommandLine;
+using Microsoft.Extensions.Configuration;
+using TestCodeGenerator.Console;
 using TestCodeGenerator.Generator.Configurations;
 using TestCodeGenerator.Generator.Files;
 using TestCodeGenerator.Generator.Generators;
 using TestCodeGenerator.Generator.Services;
 
-var appsettingsName = "";
-
-var cfg = new ConfigurationBuilder()
+Parser.Default.ParseArguments<CliOptions>(args)
+    .WithParsed(o =>
+    {
+        var allConfigs = new List<BuilderConfiguration>();
+        new ConfigurationBuilder()
             .SetBasePath(Directory.GetCurrentDirectory())
-            .AddJsonFile($"appsettings.{appsettingsName}.json",
-                optional: false, reloadOnChange: false)
-            .Build();
+            .AddJsonFile("appsettings.json", optional: false, reloadOnChange: false)
+            .Build()
+            .GetSection("Settings")
+            .Bind(allConfigs);
 
-var config = new BuilderConfiguration
-{
-    DllPath = @"H:\Programming\Repositories\ProjectHermes\ShoppingList\Api\ShoppingList.Api.Domain\bin\Debug\net6.0\ShoppingList.Api.Domain.dll",
-    OutputFolder = @"E:\Personal\Downloads",
-    GenericSuperclassTypeName = "DomainTestBuilderBase",
-    GenericSuperclassNamespace = "ProjectHermes.ShoppingList.Api.Domain.TestKit.Common",
-    CtorInjectionMethodName = "FillConstructorWith",
-    OutputAssemblyRootNamespace = "ProjectHermes.ShoppingList.Api.Domain.TestKit"
-};
+        var configsMatchingName = allConfigs.Where(c => c.Name == o.SettingsName).ToList();
+        if (configsMatchingName.Count > 1)
+        {
+            Console.WriteLine($"Multiple settings with the name {o.SettingsName} found");
+            return;
+        }
+        if (!configsMatchingName.Any())
+        {
+            Console.WriteLine($"No setting with the name {o.SettingsName} found");
+            return;
+        }
 
-new TestBuilderGenerator(new FileHandler(), new TypeResolver(), config)
-    .Generate("Item");
+        new TestBuilderGenerator(new FileHandler(), new TypeResolver(), configsMatchingName.First())
+            .Generate(o.ClassName);
+    });
