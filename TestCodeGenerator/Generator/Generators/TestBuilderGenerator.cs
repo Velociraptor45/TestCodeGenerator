@@ -25,8 +25,7 @@ public class TestBuilderGenerator
     {
         _namespaces.Add(_config.GenericSuperclassNamespace);
 
-        var bytes = _fileHandler.LoadDll(_config.DllPath);
-        var assembly = Assembly.Load(bytes);
+        var assembly = _fileHandler.LoadAssembly(_config.DllPath);
 
         var types = assembly.GetTypes().Where(t => t.Name == typeName).ToList();
 
@@ -36,6 +35,7 @@ public class TestBuilderGenerator
             throw new ArgumentException($"More than one class with type name '{typeName}' found. Further distinction is currently not implemented", nameof(typeName));
 
         var type = types.Single();
+        AddNamespace(type.Namespace!);
 
         var content = GetContent(type);
 
@@ -201,12 +201,17 @@ public class {builderClassName} : {_config.GenericSuperclassTypeName}<{type.Name
         return $"new {resolvedType.OriginalType.Name}()";
     }
 
+    private void AddNamespace(string nmsp)
+    {
+        if (!_namespaces.Contains(nmsp))
+            _namespaces.Add(nmsp);
+    }
+
     private void AddNamespaces(IEnumerable<string> namespaces)
     {
         foreach (var nmsp in namespaces)
         {
-            if (!_namespaces.Contains(nmsp))
-                _namespaces.Add(nmsp);
+            AddNamespace(nmsp);
         }
     }
 

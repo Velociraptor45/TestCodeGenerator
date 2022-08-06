@@ -1,8 +1,10 @@
-﻿namespace TestCodeGenerator.Generator.Files;
+﻿using System.Reflection;
+
+namespace TestCodeGenerator.Generator.Files;
 
 public interface IFileHandler
 {
-    byte[] LoadDll(string dllPath);
+    Assembly LoadAssembly(string dllPath);
 
     void CreateFile(string path, string content);
 }
