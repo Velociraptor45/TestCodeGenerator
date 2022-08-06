@@ -47,7 +47,15 @@ public class TypeReport
     public string GetFullName()
     {
         var builder = new StringBuilder();
-        if (!IsGeneric)
+        if (IsGeneric)
+        {
+            //builder.Append(
+            //    EnumerableReport.IsOrImplementsIEnumerable
+            //        ? $"{Type.Name[..^2]}<{GetGenericArgs()}>"
+            //        : $"{Type.Name}");
+            builder.Append($"{Type.Name[..^2]}<{GetGenericArgs()}>");
+        }
+        else
         {
             if (NullabilityReport.HasNullableGenericType)
             {
@@ -58,10 +66,6 @@ public class TypeReport
             {
                 builder.Append(ResolveTypeName(Type));
             }
-        }
-        else
-        {
-            // todo
         }
 
         if (NullabilityReport.IsNullable)

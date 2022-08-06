@@ -23,7 +23,23 @@ public class TestBuilderGeneratorTests
         yield return new object[] { nameof(NullableIntTest), NullableIntTest.GetExpectedBuilder() };
         yield return new object[] { nameof(BoolTest), BoolTest.GetExpectedBuilder() };
         yield return new object[] { nameof(NullableEnumerableTest), NullableEnumerableTest.GetExpectedBuilder() };
-        yield return new object[] { nameof(NullableEnumerableWithNullableArgTest), NullableEnumerableWithNullableArgTest.GetExpectedBuilder() };
+        yield return new object[]
+        {
+            nameof(NullableEnumerableWithNullableArgTest),
+            NullableEnumerableWithNullableArgTest.GetExpectedBuilder()
+        };
+        yield return new object[] { nameof(ListTest), ListTest.GetExpectedBuilder() };
+        yield return new object[] { nameof(EnumerableTest), EnumerableTest.GetExpectedBuilder() };
+        yield return new object[]
+        {
+            nameof(InheritFromIEnumerableWithStandardCtorTest),
+            InheritFromIEnumerableWithStandardCtorTest.GetExpectedBuilder()
+        };
+        yield return new object[]
+        {
+            nameof(InheritFromIEnumerableWithoutStandardCtorTest),
+            InheritFromIEnumerableWithoutStandardCtorTest.GetExpectedBuilder()
+        };
     }
 
     [Theory]
