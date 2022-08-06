@@ -60,8 +60,9 @@ TestCodeGenerator.exe -c "Item" -s "Domain"
 it will generate this builder:
 
 ```c#
-using MyProject.Domain.Availabilities.Models
+using MyProject.Domain.Availabilities.Models;
 using MyProject.Domain.Items.Models;
+using MyProject.Domain.TestKit.Common;
 using System;
 using System.Collections.Generic;
 
