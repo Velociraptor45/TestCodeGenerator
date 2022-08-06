@@ -9,6 +9,8 @@ The generated builders will not build the object itself but rather provide the "
 
 ## Limitations
 - Nullability is currently only handled for parameter types that are explicitely labeled as nullable with a `?`
+- No support for interfaces that inherit from `IEnumerable<T>` as parameter types
+- No support for generic type as generic type argument e.g. `IEnumerable<IEnumerable<int>>`
 
 ## Example
 Let's say you have the following model,

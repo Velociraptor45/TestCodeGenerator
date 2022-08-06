@@ -6,29 +6,21 @@ public class ResolvedType
 {
     private readonly IReadOnlyCollection<string> _namespaces;
 
-    public ResolvedType(Type originalType, string nameSpace, ResolvedType? genericArgumentType = null,
-        bool isNullable = false, bool isEnumerable = false)
+    public ResolvedType(Type originalType, string nameSpace)
+        : this(originalType, new List<string> { nameSpace })
     {
-        OriginalType = originalType;
-        _namespaces = new List<string> { nameSpace };
-        GenericArgumentType = genericArgumentType;
-        IsNullable = isNullable;
-        IsOrImplementsEnumerable = isEnumerable;
     }
 
-    public ResolvedType(Type originalType, IEnumerable<string> namespaces, ResolvedType? genericArgumentType = null,
-        bool isNullable = false, bool isEnumerable = false)
+    public ResolvedType(Type originalType, IEnumerable<string> namespaces)
     {
         OriginalType = originalType;
         _namespaces = namespaces.ToList();
-        GenericArgumentType = genericArgumentType;
-        IsNullable = isNullable;
-        IsOrImplementsEnumerable = isEnumerable;
     }
 
     public Type OriginalType { get; }
     public ResolvedType? GenericArgumentType { get; init; }
     public bool IsOrImplementsEnumerable { get; init; }
+    public bool IsEnumerable { get; init; }
     public bool IsNullable { get; init; }
     public bool IsGeneric => GenericArgumentType is not null;
 
@@ -39,7 +31,7 @@ public class ResolvedType
         if (IsOrImplementsEnumerable)
         {
             if (IsGeneric)
-                nameBuilder.Append($"{OriginalType.Name[..^2]}<{GenericArgumentType.GetFullName()}>");
+                nameBuilder.Append($"{OriginalType.Name[..^2]}<{GetAllGenericsCommaSeparated()}>");
             else
                 nameBuilder.Append($"{OriginalType.Name}");
         }
@@ -70,6 +62,14 @@ public class ResolvedType
             return _namespaces;
 
         return _namespaces.Union(GenericArgumentType.GetAllNamespaces());
+    }
+
+    public string GetAllGenericsCommaSeparated()
+    {
+        if (!IsGeneric)
+            return string.Empty;
+
+        return string.Join(", ", OriginalType.GetGenericArguments().Select(ResolveTypeName));
     }
 
     private static string? ResolveTypeName(Type? type)

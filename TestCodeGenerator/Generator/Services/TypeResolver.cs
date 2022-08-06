@@ -9,7 +9,7 @@ public class TypeResolver
     {
         var enumerableReport = AnalyzeForEnumerable(param.ParameterType);
 
-        if (enumerableReport.IsEnumerable)
+        if (enumerableReport.IsEnumerable || enumerableReport.ImplementsEnumerableAsInterface)
         {
             return GetEnumerableParameterTypeName(enumerableReport, param);
         }
@@ -25,6 +25,7 @@ public class TypeResolver
         {
             GenericArgumentType = enumerableReport.IsActualTypeGeneric ? resolvedGenericType : null,
             IsOrImplementsEnumerable = true,
+            IsEnumerable = enumerableReport.IsEnumerable,
             IsNullable = param.IsNullable()
         };
 
@@ -61,7 +62,7 @@ public class TypeResolver
             if (intType.IsGenericType
                 && intType.GetGenericTypeDefinition() == typeof(IEnumerable<>))
             {
-                return new EnumerableReport(type, true, type.IsGenericType, true, intType.GetGenericArguments()[0]);
+                return new EnumerableReport(type, false, type.IsGenericType, true, intType.GetGenericArguments()[0]);
             }
         }
         return EnumerableReport.NoEnumerable(type);

@@ -182,7 +182,12 @@ public class {builderClassName} : {_config.GenericSuperclassTypeName}<{type.Name
 
         if (resolvedType.IsGeneric)
         {
-            // todo: distinguish between List, Dictionary, IEnumerable, etc.
+            if (!resolvedType.IsEnumerable)
+            {
+                return $"new {resolvedType.OriginalType.Name[..^2]}<{resolvedType.GetAllGenericsCommaSeparated()}>()";
+            }
+
+            // todo: support for interfaces inheriting from IEnumerable<T>
             return $"Enumerable.Empty<{resolvedType.GenericArgumentType!.GetFullName()}>()";
         }
 
