@@ -9,7 +9,7 @@ public class TypeReport
     {
         Type = type;
         NullabilityReport = new NullabilityReport(type, nullabilityInfo);
-        EnumerableReport = new EnumeraReport(type);
+        EnumerableReport = new EnumerableReport(type);
 
         GenericTypeArgs = GetTypeReportsForGenericArguments(type, nullabilityInfo).ToList();
     }
@@ -32,7 +32,9 @@ public class TypeReport
     public bool IsGeneric => GenericTypeArgs.Any();
     public NullabilityReport NullabilityReport { get; }
     public IReadOnlyCollection<TypeReport> GenericTypeArgs { get; }
-    public EnumeraReport EnumerableReport { get; }
+    public EnumerableReport EnumerableReport { get; }
+
+    public bool HasStandardCtor => Type.GetConstructors().Any(c => !c.GetParameters().Any());
 
     public IEnumerable<string> GetAllNamespaces()
     {
@@ -49,10 +51,6 @@ public class TypeReport
         var builder = new StringBuilder();
         if (IsGeneric)
         {
-            //builder.Append(
-            //    EnumerableReport.IsOrImplementsIEnumerable
-            //        ? $"{Type.Name[..^2]}<{GetGenericArgs()}>"
-            //        : $"{Type.Name}");
             builder.Append($"{Type.Name[..^2]}<{GetGenericArgs()}>");
         }
         else

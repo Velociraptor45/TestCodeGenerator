@@ -3,7 +3,6 @@ using System.Reflection;
 using TestCodeGenerator.Generator.Configurations;
 using TestCodeGenerator.Generator.Files;
 using TestCodeGenerator.Generator.Generators;
-using TestCodeGenerator.Generator.Services;
 using TestCodeGenerator.Generator.Tests.Generators.TestClasses;
 
 namespace TestCodeGenerator.Generator.Tests.Generators;
@@ -80,7 +79,7 @@ public class TestBuilderGeneratorTests
 
         public TestBuilderGenerator CreateSut()
         {
-            return new TestBuilderGenerator(_fileHandlerMock.Object, new TypeResolver(), _builderConfiguration);
+            return new TestBuilderGenerator(_fileHandlerMock.Object, _builderConfiguration);
         }
 
         public void SetupFileHandlerLoadingAssembly()

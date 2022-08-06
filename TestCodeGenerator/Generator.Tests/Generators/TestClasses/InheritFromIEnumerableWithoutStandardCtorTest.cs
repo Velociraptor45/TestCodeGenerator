@@ -4,12 +4,12 @@ namespace TestCodeGenerator.Generator.Tests.Generators.TestClasses;
 
 public class InheritFromIEnumerableWithoutStandardCtorTest
 {
-    public InheritFromIEnumerableWithoutStandardCtorTest(InheritFromIEnumerableWithStandardCtor ids)
+    public InheritFromIEnumerableWithoutStandardCtorTest(InheritFromIEnumerableWithoutStandardCtor ids)
     {
         Ids = ids;
     }
 
-    public InheritFromIEnumerableWithStandardCtor Ids { get; }
+    public InheritFromIEnumerableWithoutStandardCtor Ids { get; }
 
     public static string GetExpectedBuilder()
     {
@@ -21,7 +21,7 @@ namespace TestCodeGenerator.Generator.Tests.Tests.Generators.TestClasses;
 
 public class InheritFromIEnumerableWithoutStandardCtorTestBuilder : DomainTestBuilderBase<InheritFromIEnumerableWithoutStandardCtorTest>
 {
-    public InheritFromIEnumerableWithoutStandardCtorTestBuilder WithIds(InheritFromIEnumerableWithStandardCtor ids)
+    public InheritFromIEnumerableWithoutStandardCtorTestBuilder WithIds(InheritFromIEnumerableWithoutStandardCtor ids)
     {
         FillConstructorWith(nameof(ids), ids);
         return this;
