@@ -28,6 +28,7 @@ public class TestBuilderGeneratorTests
             NullableEnumerableWithNullableArgTest.GetExpectedBuilder()
         };
         yield return new object[] { nameof(ListTest), ListTest.GetExpectedBuilder() };
+        yield return new object[] { nameof(DictionaryTest), DictionaryTest.GetExpectedBuilder() };
         yield return new object[] { nameof(EnumerableTest), EnumerableTest.GetExpectedBuilder() };
         yield return new object[]
         {
@@ -39,6 +40,14 @@ public class TestBuilderGeneratorTests
             nameof(InheritFromIEnumerableWithoutStandardCtorTest),
             InheritFromIEnumerableWithoutStandardCtorTest.GetExpectedBuilder()
         };
+        yield return new object[] { nameof(NullableDictionaryTest), NullableDictionaryTest.GetExpectedBuilder() };
+        yield return new object[]
+        {
+            nameof(NullableDictionaryWithSecondArgNullableTest),
+            NullableDictionaryWithSecondArgNullableTest.GetExpectedBuilder()
+        };
+        yield return new object[] { nameof(SingleGenericTest), SingleGenericTest.GetExpectedBuilder() };
+        yield return new object[] { nameof(DoubleGenericTest), DoubleGenericTest.GetExpectedBuilder() };
     }
 
     [Theory]
