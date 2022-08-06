@@ -1,5 +1,4 @@
-﻿using Moq;
-using System.Reflection;
+﻿using System.Reflection;
 using TestCodeGenerator.Generator.Configurations;
 using TestCodeGenerator.Generator.Files;
 using TestCodeGenerator.Generator.Generators;
@@ -24,8 +23,7 @@ public class TestBuilderGeneratorTests
         yield return new object[] { nameof(NullableEnumerableTest), NullableEnumerableTest.GetExpectedBuilder() };
         yield return new object[]
         {
-            nameof(NullableEnumerableWithNullableArgTest),
-            NullableEnumerableWithNullableArgTest.GetExpectedBuilder()
+            nameof(NullableEnumerableWithNullableArgTest), NullableEnumerableWithNullableArgTest.GetExpectedBuilder()
         };
         yield return new object[] { nameof(ListTest), ListTest.GetExpectedBuilder() };
         yield return new object[] { nameof(DictionaryTest), DictionaryTest.GetExpectedBuilder() };
@@ -48,6 +46,32 @@ public class TestBuilderGeneratorTests
         };
         yield return new object[] { nameof(SingleGenericTest), SingleGenericTest.GetExpectedBuilder() };
         yield return new object[] { nameof(DoubleGenericTest), DoubleGenericTest.GetExpectedBuilder() };
+        yield return new object[]
+        {
+            nameof(NullableEnumerableInEnumerableTest), NullableEnumerableInEnumerableTest.GetExpectedBuilder()
+        };
+        yield return new object[]
+        {
+            nameof(EnumerableInEnumerableTest), EnumerableInEnumerableTest.GetExpectedBuilder()
+        };
+        yield return new object[] { nameof(ListInEnumerableTest), ListInEnumerableTest.GetExpectedBuilder() };
+        yield return new object[] { nameof(EnumerableInListTest), EnumerableInListTest.GetExpectedBuilder() };
+        yield return new object[]
+        {
+            nameof(DoubleGenericInEnumerableTest), DoubleGenericInEnumerableTest.GetExpectedBuilder()
+        };
+        yield return new object[]
+        {
+            nameof(SingleGenericInDoubleGenericTest), SingleGenericInDoubleGenericTest.GetExpectedBuilder()
+        };
+        yield return new object[]
+        {
+            nameof(DuplicatedCtorParametersTest), DuplicatedCtorParametersTest.GetExpectedBuilder()
+        };
+        yield return new object[]
+        {
+            nameof(DuplicatedCtorParameterTypesTest), DuplicatedCtorParameterTypesTest.GetExpectedBuilder()
+        };
     }
 
     [Theory]
