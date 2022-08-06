@@ -4,7 +4,6 @@ using TestCodeGenerator.Console;
 using TestCodeGenerator.Generator.Configurations;
 using TestCodeGenerator.Generator.Files;
 using TestCodeGenerator.Generator.Generators;
-using TestCodeGenerator.Generator.Services;
 
 Parser.Default.ParseArguments<CliOptions>(args)
     .WithParsed(o =>
@@ -29,6 +28,6 @@ Parser.Default.ParseArguments<CliOptions>(args)
             return;
         }
 
-        new TestBuilderGenerator(new FileHandler(), new TypeResolver(), configsMatchingName.First())
+        new TestBuilderGenerator(new FileHandler(), configsMatchingName.First())
             .Generate(o.ClassName);
     });

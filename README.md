@@ -4,13 +4,21 @@ The generated builders will not build the object itself but rather provide the "
 
 ## Features
 - Detect multiple constructors and deduplicate parameters
-- Detect & handle non-generic parameter types that inherit from `IEnumerable<T>`
+- Detect & handle non-generic parameter types that inherit from `IEnumerable<T>`, e.g. `List<T>`, `Dictionary<T1, T2>` or your own custom implementations
 - Detect & handle nullable parameter types
+- Support for generic types as generic type argument e.g. `IEnumerable<IEnumerable<int>>`
+- Generate `WithEmpty` method for parameter types inheriting from `IEnumerable<T>` if they are classes
+- Generate `Without` method for nullable parameter types
 
 ## Limitations
 - Nullability is currently only handled for parameter types that are explicitely labeled as nullable with a `?`
-- No support for interfaces that inherit from `IEnumerable<T>` as parameter types
-- No support for generic type as generic type argument e.g. `IEnumerable<IEnumerable<int>>`
+- No `WithEmpty` support for interfaces that inherit from `IEnumerable<T>` as parameter types e.g. `IList<T>`
+
+## Cli Arguments
+- `-c` | `--class` <br/>
+The name of the class you want to create a builder for
+- `-s | --settings` <br/>
+The name of settings object that you want to use in your appsettings file
 
 ## Example
 Let's say you have the following model,
@@ -60,8 +68,9 @@ TestCodeGenerator.exe -c "Item" -s "Domain"
 it will generate this builder:
 
 ```c#
-using MyProject.Domain.Availabilities.Models
+using MyProject.Domain.Availabilities.Models;
 using MyProject.Domain.Items.Models;
+using MyProject.Domain.TestKit.Common;
 using System;
 using System.Collections.Generic;
 

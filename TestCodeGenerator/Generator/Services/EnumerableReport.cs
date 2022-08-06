@@ -2,27 +2,43 @@
 
 public class EnumerableReport
 {
-    public EnumerableReport(Type actualType, bool isEnumerable, bool isActualTypeGeneric,
-        bool implementsEnumerableAsInterface, Type? genericArgumentType)
+    public EnumerableReport(Type type)
     {
-        if (isEnumerable && genericArgumentType is null)
-            throw new ArgumentException("Non-generic enumerables are currently not supported");
+        if (type == typeof(string))
+        {
+            IsIEnumerable = false;
+            ImplementsIEnumerable = false;
+            return;
+        }
 
-        ActualType = actualType;
-        IsEnumerable = isEnumerable;
-        IsActualTypeGeneric = isActualTypeGeneric;
-        ImplementsEnumerableAsInterface = implementsEnumerableAsInterface;
-        GenericArgumentType = genericArgumentType;
+        if (type.IsInterface && type.GetGenericTypeDefinition() == typeof(IEnumerable<>))
+        {
+            IsIEnumerable = true;
+            ImplementsIEnumerable = false;
+            return;
+        }
+
+        IsIEnumerable = false;
+
+        if (AnyInterfaceImplementIEnumerable(type))
+        {
+            ImplementsIEnumerable = true;
+            return;
+        }
+
+        ImplementsIEnumerable = false;
     }
 
-    public Type ActualType { get; }
-    public bool IsEnumerable { get; }
-    public bool IsActualTypeGeneric { get; }
-    public bool ImplementsEnumerableAsInterface { get; }
-    public Type? GenericArgumentType { get; }
-
-    public static EnumerableReport NoEnumerable(Type type)
+    private bool AnyInterfaceImplementIEnumerable(Type type)
     {
-        return new(type, false, false, false, null);
+        return type
+            .GetInterfaces()
+            .Any(intType => intType.IsGenericType
+                            && (intType.GetGenericTypeDefinition() == typeof(IEnumerable<>)
+                                || intType.GetInterfaces().Any(AnyInterfaceImplementIEnumerable)));
     }
+
+    public bool IsIEnumerable { get; }
+    public bool ImplementsIEnumerable { get; }
+    public bool IsOrImplementsIEnumerable => IsIEnumerable || ImplementsIEnumerable;
 }
