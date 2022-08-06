@@ -104,23 +104,26 @@ public class {builderClassName} : {_config.GenericSuperclassTypeName}<{type.Name
 
     private string BuildMethod(ParameterInfo param, string builderClassName)
     {
-        var resolvedType = _typeResolver.Resolve(param);
-        AddNamespaces(resolvedType.GetAllNamespaces());
+        //var resolvedType = _typeResolver.Resolve(param);
+        NullabilityInfoContext context = new();
+        var nullabilityInfo = context.Create(param);
+        var typeReport = new TypeReport(param.ParameterType, nullabilityInfo);
+        AddNamespaces(typeReport.GetAllNamespaces());
 
-        if (resolvedType.IsOrImplementsEnumerable)
+        if (typeReport.EnumerableReport.IsOrImplementsIEnumerable)
         {
-            return BuildEnumerableParameterMethods(param, resolvedType, builderClassName);
+            return BuildEnumerableParameterMethods(param, typeReport, builderClassName);
         }
 
-        return BuildMethod(param, resolvedType, builderClassName);
+        return BuildMethod(param, typeReport, builderClassName);
     }
 
-    private string BuildMethod(ParameterInfo param, ResolvedType resolvedType, string builderClassName)
+    private string BuildMethod(ParameterInfo param, TypeReport typeReport, string builderClassName)
     {
         var strBuilder = new StringBuilder();
         var capitalizedName = CapitalizeFirstLetter(param.Name!);
 
-        strBuilder.Append(@$"public {builderClassName} With{capitalizedName}({resolvedType.GetFullName()} {param.Name})
+        strBuilder.Append(@$"public {builderClassName} With{capitalizedName}({typeReport.GetFullName()} {param.Name})
     {{
         {_config.CtorInjectionMethodName}(nameof({param.Name}), {param.Name});
         return this;
@@ -138,14 +141,14 @@ public class {builderClassName} : {_config.GenericSuperclassTypeName}<{type.Name
         return strBuilder.ToString();
     }
 
-    private string BuildEnumerableParameterMethods(ParameterInfo param, ResolvedType resolvedType, string builderClassName)
+    private string BuildEnumerableParameterMethods(ParameterInfo param, TypeReport typeReport, string builderClassName)
     {
         var strBuilder = new StringBuilder();
         var capitalizedName = CapitalizeFirstLetter(param.Name!);
-        var emptyEnumerableInitialization = GetInitializationOfEmptyEnumerable(resolvedType);
+        var emptyEnumerableInitialization = GetInitializationOfEmptyEnumerable(typeReport);
 
         // With
-        strBuilder.Append(@$"public {builderClassName} With{capitalizedName}({resolvedType.GetFullName()} {param.Name})
+        strBuilder.Append(@$"public {builderClassName} With{capitalizedName}({typeReport.GetFullName()} {param.Name})
     {{
         {_config.CtorInjectionMethodName}(nameof({param.Name}), {param.Name});
         return this;
@@ -162,7 +165,7 @@ public class {builderClassName} : {_config.GenericSuperclassTypeName}<{type.Name
         }
 
         // Without
-        if (resolvedType.IsNullable)
+        if (typeReport.NullabilityReport.IsNullable)
         {
             strBuilder.Append($@"{Environment.NewLine}
     public {builderClassName} Without{capitalizedName}()
@@ -174,31 +177,31 @@ public class {builderClassName} : {_config.GenericSuperclassTypeName}<{type.Name
         return strBuilder.ToString();
     }
 
-    private string? GetInitializationOfEmptyEnumerable(ResolvedType resolvedType)
+    private string? GetInitializationOfEmptyEnumerable(TypeReport typeReport)
     {
-        if (!resolvedType.IsOrImplementsEnumerable)
+        if (!typeReport.EnumerableReport.IsOrImplementsIEnumerable)
             throw new InvalidOperationException(
                 "Cannot create statement for enumerable initialization when type doesn't implement IEnumerable");
 
-        if (resolvedType.IsGeneric)
+        if (typeReport.IsGeneric)
         {
-            if (!resolvedType.IsEnumerable)
+            if (!typeReport.EnumerableReport.IsIEnumerable)
             {
-                return $"new {resolvedType.OriginalType.Name[..^2]}<{resolvedType.GetAllGenericsCommaSeparated()}>()";
+                return $"new {typeReport.Type.Name[..^2]}<{typeReport.GetGenericArgs()}>()";
             }
 
             // todo: support for interfaces inheriting from IEnumerable<T>
-            return $"Enumerable.Empty<{resolvedType.GenericArgumentType!.GetFullName()}>()";
+            return $"Enumerable.Empty<{typeReport.GenericTypeArgs.First().GetFullName()}>()";
         }
 
-        if (resolvedType.OriginalType.GetConstructors().All(c => c.GetParameters().Any()))
+        if (typeReport.Type.GetConstructors().All(c => c.GetParameters().Any()))
         {
             Console.WriteLine(
-                $"No standard ctor found for type {resolvedType.OriginalType.Name}. Skipping 'WithEmpty' method");
+                $"No standard ctor found for type {typeReport.Type.Name}. Skipping 'WithEmpty' method");
             return null;
         }
 
-        return $"new {resolvedType.OriginalType.Name}()";
+        return $"new {typeReport.Type.Name}()";
     }
 
     private void AddNamespace(string nmsp)

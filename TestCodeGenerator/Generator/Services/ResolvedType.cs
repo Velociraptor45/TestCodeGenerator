@@ -18,11 +18,11 @@ public class ResolvedType
     }
 
     public Type OriginalType { get; }
-    public ResolvedType? GenericArgumentType { get; init; }
+    public IList<ResolvedType> GenericArgumentTypes { get; init; }
     public bool IsOrImplementsEnumerable { get; init; }
     public bool IsEnumerable { get; init; }
     public bool IsNullable { get; init; }
-    public bool IsGeneric => GenericArgumentType is not null;
+    public bool IsGeneric => GenericArgumentTypes.Any();
 
     public string GetFullName()
     {
@@ -31,7 +31,7 @@ public class ResolvedType
         if (IsOrImplementsEnumerable)
         {
             if (IsGeneric)
-                nameBuilder.Append($"{OriginalType.Name[..^2]}<{GetAllGenericsCommaSeparated()}>");
+                nameBuilder.Append($"{OriginalType.Name[..^2]}<{GetAllGenericArgsCommaSeparated()}>");
             else
                 nameBuilder.Append($"{OriginalType.Name}");
         }
@@ -58,13 +58,13 @@ public class ResolvedType
 
     public IEnumerable<string> GetAllNamespaces()
     {
-        if (GenericArgumentType is null)
+        if (!IsGeneric)
             return _namespaces;
 
-        return _namespaces.Union(GenericArgumentType.GetAllNamespaces());
+        return _namespaces.Union(GenericArgumentTypes.SelectMany(arg => arg.GetAllNamespaces()));
     }
 
-    public string GetAllGenericsCommaSeparated()
+    public string GetAllGenericArgsCommaSeparated()
     {
         if (!IsGeneric)
             return string.Empty;

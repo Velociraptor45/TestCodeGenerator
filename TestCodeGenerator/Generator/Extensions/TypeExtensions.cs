@@ -7,7 +7,7 @@ public static class TypeExtensions
     public static bool IsNullable(this ParameterInfo param, bool evaluateGenericArguments = false)
     {
         var isNullabilityType = param.ParameterType.IsGenericType
-            && param.ParameterType.GetGenericTypeDefinition().Equals(typeof(Nullable<>));
+            && param.ParameterType.GetGenericTypeDefinition() == typeof(Nullable<>);
 
         if (isNullabilityType)
             return true;

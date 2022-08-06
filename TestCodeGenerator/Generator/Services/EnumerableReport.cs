@@ -3,26 +3,26 @@
 public class EnumerableReport
 {
     public EnumerableReport(Type actualType, bool isEnumerable, bool isActualTypeGeneric,
-        bool implementsEnumerableAsInterface, Type? genericArgumentType)
+        bool implementsEnumerableAsInterface, IEnumerable<Type> genericArgumentTypes)
     {
-        if (isEnumerable && genericArgumentType is null)
+        if (isEnumerable && genericArgumentTypes is null)
             throw new ArgumentException("Non-generic enumerables are currently not supported");
 
         ActualType = actualType;
         IsEnumerable = isEnumerable;
         IsActualTypeGeneric = isActualTypeGeneric;
         ImplementsEnumerableAsInterface = implementsEnumerableAsInterface;
-        GenericArgumentType = genericArgumentType;
+        GenericArgumentTypes = genericArgumentTypes.ToList();
     }
 
     public Type ActualType { get; }
     public bool IsEnumerable { get; }
     public bool IsActualTypeGeneric { get; }
     public bool ImplementsEnumerableAsInterface { get; }
-    public Type? GenericArgumentType { get; }
+    public IReadOnlyCollection<Type> GenericArgumentTypes { get; }
 
     public static EnumerableReport NoEnumerable(Type type)
     {
-        return new(type, false, false, false, null);
+        return new EnumerableReport(type, false, false, false, Enumerable.Empty<Type>());
     }
 }
