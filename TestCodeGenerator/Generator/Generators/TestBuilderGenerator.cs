@@ -1,5 +1,6 @@
-﻿using System.Reflection;
-using System.Text;
+﻿using RefleCS;
+using RefleCS.Nodes;
+using System.Reflection;
 using TestCodeGenerator.Generator.Configurations;
 using TestCodeGenerator.Generator.Files;
 using TestCodeGenerator.Generator.Services;
@@ -9,12 +10,14 @@ namespace TestCodeGenerator.Generator.Generators;
 public class TestBuilderGenerator
 {
     private readonly IFileHandler _fileHandler;
+    private readonly ICsFileHandler _csFileHandler;
     private readonly BuilderConfiguration _config;
     private readonly HashSet<string> _namespaces = new();
 
-    public TestBuilderGenerator(IFileHandler fileHandler, BuilderConfiguration config)
+    public TestBuilderGenerator(IFileHandler fileHandler, ICsFileHandler csFileHandler, BuilderConfiguration config)
     {
         _fileHandler = fileHandler;
+        _csFileHandler = csFileHandler;
         _config = config;
     }
 
@@ -34,31 +37,26 @@ public class TestBuilderGenerator
         var type = types.Single();
         AddNamespace(type.Namespace!);
 
-        var content = GetContent(type);
-
-        _fileHandler.CreateFile(Path.Combine(_config.OutputFolder, $"{type.Name}Builder.cs"), content);
+        var file = GenerateFile(type);
+        _csFileHandler.SaveOrReplace(file, Path.Combine(_config.OutputFolder, $"{type.Name}Builder.cs"));
     }
 
-    private string GetContent(Type type)
+    private CsFile GenerateFile(Type type)
     {
         var builderClassName = $"{type.Name}Builder";
 
-        var contentBuilder = new StringBuilder();
+        var cls = Class.Public(builderClassName);
+        cls.AddBaseType(new BaseType($"{_config.GenericSuperclassTypeName}<{type.Name}>"));
 
-        contentBuilder.Append($@"
-namespace {GetBuilderClassNamespace(type)};
+        AddMethods(type, builderClassName, cls);
 
-public class {builderClassName} : {_config.GenericSuperclassTypeName}<{type.Name}>
-{{
-    {GetMethods(type, builderClassName)}
-}}
-");
-        foreach (var nmsp in _namespaces.OrderByDescending(nmsp => nmsp))
-        {
-            contentBuilder.Insert(0, $"using {nmsp};{Environment.NewLine}");
-        }
+        var nmsp = new Namespace(GetBuilderClassNamespace(type), new List<Class> { cls });
 
-        return contentBuilder.ToString();
+        var file = new CsFile(
+            _namespaces.OrderBy(n => n).Select(n => new Using(n)),
+            nmsp);
+
+        return file;
     }
 
     private string GetBuilderClassNamespace(Type type)
@@ -77,7 +75,7 @@ public class {builderClassName} : {_config.GenericSuperclassTypeName}<{type.Name
         throw new InvalidOperationException("Namespace detection failed. Debug me");
     }
 
-    private string GetMethods(Type type, string builderClassName)
+    private void AddMethods(Type type, string builderClassName, Class cls)
     {
         var parameters = new Dictionary<(string, string), ParameterInfo>();
 
@@ -93,13 +91,13 @@ public class {builderClassName} : {_config.GenericSuperclassTypeName}<{type.Name
             }
         }
 
-        var methods = parameters.Values.Select(p => BuildMethod(p, builderClassName));
-
-        return string.Join($@"{Environment.NewLine}
-    ", methods);
+        foreach (var info in parameters.Values)
+        {
+            AddMethod(info, builderClassName, cls);
+        }
     }
 
-    private string BuildMethod(ParameterInfo param, string builderClassName)
+    private void AddMethod(ParameterInfo param, string builderClassName, Class cls)
     {
         NullabilityInfoContext context = new();
         var nullabilityInfo = context.Create(param);
@@ -108,56 +106,65 @@ public class {builderClassName} : {_config.GenericSuperclassTypeName}<{type.Name
 
         if (typeReport.EnumerableReport.IsOrImplementsIEnumerable)
         {
-            return BuildEnumerableParameterMethods(param, typeReport, builderClassName);
+            AddEnumerableParameterMethods(param, typeReport, builderClassName, cls);
+            return;
         }
 
-        return BuildMethod(param, typeReport, builderClassName);
+        AddMethod(param, typeReport, builderClassName, cls);
     }
 
-    private string BuildMethod(ParameterInfo param, TypeReport typeReport, string builderClassName)
+    private void AddMethod(ParameterInfo param, TypeReport typeReport, string builderClassName, Class cls)
     {
-        var strBuilder = new StringBuilder();
         var capitalizedName = CapitalizeFirstLetter(param.Name!);
 
-        strBuilder.Append(@$"public {builderClassName} With{capitalizedName}({typeReport.GetFullName()} {param.Name})
-    {{
-        {_config.CtorInjectionMethodName}(nameof({param.Name}), {param.Name});
-        return this;
-    }}");
+        var method = Method.Public(
+            builderClassName,
+            $"With{capitalizedName}",
+            new List<Parameter> { new(typeReport.GetFullName(), param.Name!) },
+            new List<Statement>
+            {
+                new($"{_config.CtorInjectionMethodName}(nameof({param.Name}), {param.Name});"),
+                new("return this;")
+            });
+        cls.AddMethod(method);
 
         if (typeReport.NullabilityReport.IsNullable)
         {
-            strBuilder.Append(@$"{Environment.NewLine}
-    public {builderClassName} Without{capitalizedName}()
-    {{
-        return With{capitalizedName}(null);
-    }}");
+            var withoutMethod = Method.Public(
+                builderClassName,
+                $"Without{capitalizedName}");
+            withoutMethod.AddStatement(new($"return With{capitalizedName}(null);"));
+            cls.AddMethod(withoutMethod);
         }
-
-        return strBuilder.ToString();
     }
 
-    private string BuildEnumerableParameterMethods(ParameterInfo param, TypeReport typeReport, string builderClassName)
+    private void AddEnumerableParameterMethods(ParameterInfo param, TypeReport typeReport, string builderClassName,
+        Class cls)
     {
-        var strBuilder = new StringBuilder();
         var capitalizedName = CapitalizeFirstLetter(param.Name!);
 
         // With
-        strBuilder.Append(@$"public {builderClassName} With{capitalizedName}({typeReport.GetFullName()} {param.Name})
-    {{
-        {_config.CtorInjectionMethodName}(nameof({param.Name}), {param.Name});
-        return this;
-    }}");
+        var withMethod = Method.Public(
+            builderClassName,
+            $"With{capitalizedName}",
+            new List<Parameter> { new(typeReport.GetFullName(), param.Name!) },
+            new List<Statement>
+            {
+                new($"{_config.CtorInjectionMethodName}(nameof({param.Name}), {param.Name});"),
+                new("return this;")
+            });
+        cls.AddMethod(withMethod);
 
         // WithEmpty
         if (typeReport.HasStandardCtor || typeReport.EnumerableReport.IsIEnumerable)
         {
             var emptyEnumerableInitialization = GetInitializationOfEmptyEnumerable(typeReport);
-            strBuilder.Append(@$"{Environment.NewLine}
-    public {builderClassName} WithEmpty{capitalizedName}()
-    {{
-        return With{capitalizedName}({emptyEnumerableInitialization});
-    }}");
+
+            var withEmptyMethod = Method.Public(
+                builderClassName,
+                $"WithEmpty{capitalizedName}");
+            withEmptyMethod.AddStatement(new($"return With{capitalizedName}({emptyEnumerableInitialization});"));
+            cls.AddMethod(withEmptyMethod);
         }
         else
         {
@@ -168,14 +175,12 @@ public class {builderClassName} : {_config.GenericSuperclassTypeName}<{type.Name
         // Without
         if (typeReport.NullabilityReport.IsNullable)
         {
-            strBuilder.Append($@"{Environment.NewLine}
-    public {builderClassName} Without{capitalizedName}()
-    {{
-        return With{capitalizedName}(null);
-    }}");
+            var withoutMethod = Method.Public(
+                builderClassName,
+                $"Without{capitalizedName}");
+            withoutMethod.AddStatement(new($"return With{capitalizedName}(null);"));
+            cls.AddMethod(withoutMethod);
         }
-
-        return strBuilder.ToString();
     }
 
     private string GetInitializationOfEmptyEnumerable(TypeReport typeReport)

@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using RefleCS;
+using System.Reflection;
 using TestCodeGenerator.Generator.Configurations;
 using TestCodeGenerator.Generator.Files;
 using TestCodeGenerator.Generator.Generators;
@@ -112,7 +113,7 @@ public class TestBuilderGeneratorTests
 
         public TestBuilderGenerator CreateSut()
         {
-            return new TestBuilderGenerator(_fileHandlerMock.Object, _builderConfiguration);
+            return new TestBuilderGenerator(_fileHandlerMock.Object, new CsFileHandler(), _builderConfiguration);
         }
 
         public void SetupFileHandlerLoadingAssembly()
