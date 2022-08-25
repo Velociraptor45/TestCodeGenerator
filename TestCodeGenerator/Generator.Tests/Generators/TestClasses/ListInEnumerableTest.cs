@@ -17,7 +17,6 @@ using System.Collections.Generic;
 using TestCodeGenerator.Generator.Tests.Generators.TestClasses;
 
 namespace TestCodeGenerator.Generator.Tests.Tests.Generators.TestClasses;
-
 public class ListInEnumerableTestBuilder : DomainTestBuilderBase<ListInEnumerableTest>
 {
     public ListInEnumerableTestBuilder WithIds(IEnumerable<List<int>?> ids)
@@ -30,7 +29,6 @@ public class ListInEnumerableTestBuilder : DomainTestBuilderBase<ListInEnumerabl
     {
         return WithIds(Enumerable.Empty<List<int>?>());
     }
-}
-";
+}";
     }
 }

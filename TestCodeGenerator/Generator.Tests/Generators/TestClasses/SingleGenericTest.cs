@@ -19,7 +19,6 @@ using TestCodeGenerator.Generator.Tests.Generators.Subclasses;
 using TestCodeGenerator.Generator.Tests.Generators.TestClasses;
 
 namespace TestCodeGenerator.Generator.Tests.Tests.Generators.TestClasses;
-
 public class SingleGenericTestBuilder : DomainTestBuilderBase<SingleGenericTest>
 {
     public SingleGenericTestBuilder WithIds(SingleGeneric<char> ids)
@@ -27,7 +26,6 @@ public class SingleGenericTestBuilder : DomainTestBuilderBase<SingleGenericTest>
         FillConstructorWith(nameof(ids), ids);
         return this;
     }
-}
-";
+}";
     }
 }

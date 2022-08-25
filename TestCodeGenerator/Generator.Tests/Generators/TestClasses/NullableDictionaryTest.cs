@@ -17,7 +17,6 @@ using System.Collections.Generic;
 using TestCodeGenerator.Generator.Tests.Generators.TestClasses;
 
 namespace TestCodeGenerator.Generator.Tests.Tests.Generators.TestClasses;
-
 public class NullableDictionaryTestBuilder : DomainTestBuilderBase<NullableDictionaryTest>
 {
     public NullableDictionaryTestBuilder WithIds(Dictionary<int, string>? ids)
@@ -35,7 +34,6 @@ public class NullableDictionaryTestBuilder : DomainTestBuilderBase<NullableDicti
     {
         return WithIds(null);
     }
-}
-";
+}";
     }
 }

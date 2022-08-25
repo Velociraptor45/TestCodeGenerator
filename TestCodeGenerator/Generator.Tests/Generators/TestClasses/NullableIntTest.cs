@@ -16,7 +16,6 @@ using System;
 using TestCodeGenerator.Generator.Tests.Generators.TestClasses;
 
 namespace TestCodeGenerator.Generator.Tests.Tests.Generators.TestClasses;
-
 public class NullableIntTestBuilder : DomainTestBuilderBase<NullableIntTest>
 {
     public NullableIntTestBuilder WithId(int? id)
@@ -29,7 +28,6 @@ public class NullableIntTestBuilder : DomainTestBuilderBase<NullableIntTest>
     {
         return WithId(null);
     }
-}
-";
+}";
     }
 }

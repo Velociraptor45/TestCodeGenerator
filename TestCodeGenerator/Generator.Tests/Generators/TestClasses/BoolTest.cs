@@ -16,7 +16,6 @@ using System;
 using TestCodeGenerator.Generator.Tests.Generators.TestClasses;
 
 namespace TestCodeGenerator.Generator.Tests.Tests.Generators.TestClasses;
-
 public class BoolTestBuilder : DomainTestBuilderBase<BoolTest>
 {
     public BoolTestBuilder WithId(bool id)
@@ -24,7 +23,6 @@ public class BoolTestBuilder : DomainTestBuilderBase<BoolTest>
         FillConstructorWith(nameof(id), id);
         return this;
     }
-}
-";
+}";
     }
 }

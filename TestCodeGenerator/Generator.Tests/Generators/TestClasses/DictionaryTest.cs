@@ -17,7 +17,6 @@ using System.Collections.Generic;
 using TestCodeGenerator.Generator.Tests.Generators.TestClasses;
 
 namespace TestCodeGenerator.Generator.Tests.Tests.Generators.TestClasses;
-
 public class DictionaryTestBuilder : DomainTestBuilderBase<DictionaryTest>
 {
     public DictionaryTestBuilder WithIds(Dictionary<int, string> ids)
@@ -30,7 +29,6 @@ public class DictionaryTestBuilder : DomainTestBuilderBase<DictionaryTest>
     {
         return WithIds(new Dictionary<int, string>());
     }
-}
-";
+}";
     }
 }

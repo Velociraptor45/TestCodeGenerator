@@ -1,9 +1,12 @@
-﻿using RefleCS;
+﻿using FluentAssertions;
+using RefleCS;
 using System.Reflection;
 using TestCodeGenerator.Generator.Configurations;
 using TestCodeGenerator.Generator.Files;
 using TestCodeGenerator.Generator.Generators;
 using TestCodeGenerator.Generator.Tests.Generators.TestClasses;
+using TestCodeGenerator.TestTools;
+using TestCodeGenerator.TestTools.Exceptions;
 
 namespace TestCodeGenerator.Generator.Tests.Generators;
 
@@ -16,7 +19,7 @@ public class TestBuilderGeneratorTests
         _fixture = new TestBuilderGeneratorFixture();
     }
 
-    private static IEnumerable<object[]> GenerateTestData()
+    public static IEnumerable<object[]> GenerateTestData()
     {
         yield return new object[] { nameof(IntTest), IntTest.GetExpectedBuilder() };
         yield return new object[] { nameof(NullableIntTest), NullableIntTest.GetExpectedBuilder() };
@@ -79,31 +82,49 @@ public class TestBuilderGeneratorTests
     [MemberData(nameof(GenerateTestData))]
     public void Generate_WithIntCtor_ShouldSaveExpectedResult(string className, string expectedBuilder)
     {
-        // Arrange
-        _fixture.SetupFileHandlerLoadingAssembly();
-        _fixture.SetupFileHandlerCreatingFile(className, expectedBuilder);
-        var sut = _fixture.CreateSut();
+        TestFolder.CreateTemp(folderPath =>
+        {
+            // Arrange
+            var filePath = Path.Combine(folderPath, $"{className}Builder.cs");
+            _fixture.SetupBuilderConfiguration(folderPath);
+            _fixture.SetupFileHandlerLoadingAssembly();
+            var sut = _fixture.CreateSut();
 
-        // Act
-        sut.Generate(className);
+            // Act
+            sut.Generate(className);
 
-        // Assert
-        _fixture.VerifyFileHandlerCreatingFile(className, expectedBuilder);
+            // Assert
+            File.Exists(filePath).Should().BeTrue();
+
+            var fileContent = File.ReadAllText(filePath);
+            fileContent.Should().Be(expectedBuilder);
+        });
     }
 
     private class TestBuilderGeneratorFixture
     {
         private readonly Mock<IFileHandler> _fileHandlerMock = new(MockBehavior.Strict);
-        private readonly BuilderConfiguration _builderConfiguration;
+        private BuilderConfiguration? _builderConfiguration;
         private readonly Assembly _assembly;
 
         public TestBuilderGeneratorFixture()
         {
             _assembly = Assembly.GetExecutingAssembly();
+        }
+
+        public TestBuilderGenerator CreateSut()
+        {
+            TestPropertyNotSetException.ThrowIfNull(_builderConfiguration);
+
+            return new TestBuilderGenerator(_fileHandlerMock.Object, new CsFileHandler(), _builderConfiguration);
+        }
+
+        public void SetupBuilderConfiguration(string outputFolder)
+        {
             _builderConfiguration = new BuilderConfiguration
             {
                 DllPath = "test.Path.dll",
-                OutputFolder = "MyOutputFolder",
+                OutputFolder = outputFolder,
                 GenericSuperclassTypeName = "DomainTestBuilderBase",
                 GenericSuperclassNamespace = "Superclass.Namespace",
                 CtorInjectionMethodName = "FillConstructorWith",
@@ -111,26 +132,10 @@ public class TestBuilderGeneratorTests
             };
         }
 
-        public TestBuilderGenerator CreateSut()
-        {
-            return new TestBuilderGenerator(_fileHandlerMock.Object, new CsFileHandler(), _builderConfiguration);
-        }
-
         public void SetupFileHandlerLoadingAssembly()
         {
             _fileHandlerMock.Setup(m => m.LoadAssembly(_builderConfiguration.DllPath))
                 .Returns(_assembly);
-        }
-
-        public void SetupFileHandlerCreatingFile(string className, string content)
-        {
-            _fileHandlerMock.Setup(m => m.CreateFile(@$"MyOutputFolder\{className}Builder.cs", content));
-        }
-
-        public void VerifyFileHandlerCreatingFile(string className, string content)
-        {
-            _fileHandlerMock
-                .Verify(m => m.CreateFile(@$"MyOutputFolder\{className}Builder.cs", content), Times.Once);
         }
     }
 }

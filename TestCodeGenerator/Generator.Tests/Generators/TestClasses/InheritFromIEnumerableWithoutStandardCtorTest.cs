@@ -18,7 +18,6 @@ using TestCodeGenerator.Generator.Tests.Generators.Subclasses;
 using TestCodeGenerator.Generator.Tests.Generators.TestClasses;
 
 namespace TestCodeGenerator.Generator.Tests.Tests.Generators.TestClasses;
-
 public class InheritFromIEnumerableWithoutStandardCtorTestBuilder : DomainTestBuilderBase<InheritFromIEnumerableWithoutStandardCtorTest>
 {
     public InheritFromIEnumerableWithoutStandardCtorTestBuilder WithIds(InheritFromIEnumerableWithoutStandardCtor ids)
@@ -26,7 +25,6 @@ public class InheritFromIEnumerableWithoutStandardCtorTestBuilder : DomainTestBu
         FillConstructorWith(nameof(ids), ids);
         return this;
     }
-}
-";
+}";
     }
 }

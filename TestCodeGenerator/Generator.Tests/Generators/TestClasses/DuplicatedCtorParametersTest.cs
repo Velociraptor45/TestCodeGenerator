@@ -22,7 +22,6 @@ using System.Collections.Generic;
 using TestCodeGenerator.Generator.Tests.Generators.TestClasses;
 
 namespace TestCodeGenerator.Generator.Tests.Tests.Generators.TestClasses;
-
 public class DuplicatedCtorParametersTestBuilder : DomainTestBuilderBase<DuplicatedCtorParametersTest>
 {
     public DuplicatedCtorParametersTestBuilder WithIds(IEnumerable<char> ids)
@@ -41,7 +40,6 @@ public class DuplicatedCtorParametersTestBuilder : DomainTestBuilderBase<Duplica
         FillConstructorWith(nameof(id), id);
         return this;
     }
-}
-";
+}";
     }
 }
