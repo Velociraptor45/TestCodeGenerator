@@ -9,12 +9,4 @@ public class FileHandler : IFileHandler
         var bytes = File.ReadAllBytes(dllPath);
         return Assembly.Load(bytes);
     }
-
-    public void CreateFile(string path, string content)
-    {
-        if (File.Exists(path))
-            File.Delete(path);
-
-        File.WriteAllText(path, content);
-    }
 }

@@ -16,7 +16,6 @@ using System;
 using TestCodeGenerator.Generator.Tests.Generators.TestClasses;
 
 namespace TestCodeGenerator.Generator.Tests.Tests.Generators.TestClasses;
-
 public class IntTestBuilder : DomainTestBuilderBase<IntTest>
 {
     public IntTestBuilder WithId(int id)
@@ -24,7 +23,6 @@ public class IntTestBuilder : DomainTestBuilderBase<IntTest>
         FillConstructorWith(nameof(id), id);
         return this;
     }
-}
-";
+}";
     }
 }

@@ -1,5 +1,6 @@
 ﻿using CommandLine;
 using Microsoft.Extensions.Configuration;
+using RefleCS;
 using TestCodeGenerator.Console;
 using TestCodeGenerator.Generator.Configurations;
 using TestCodeGenerator.Generator.Files;
@@ -28,6 +29,6 @@ Parser.Default.ParseArguments<CliOptions>(args)
             return;
         }
 
-        new TestBuilderGenerator(new FileHandler(), configsMatchingName.First())
+        new TestBuilderGenerator(new FileHandler(), new CsFileHandler(), configsMatchingName.First())
             .Generate(o.ClassName);
     });

@@ -19,7 +19,6 @@ using TestCodeGenerator.Generator.Tests.Generators.Subclasses;
 using TestCodeGenerator.Generator.Tests.Generators.TestClasses;
 
 namespace TestCodeGenerator.Generator.Tests.Tests.Generators.TestClasses;
-
 public class DoubleGenericTestBuilder : DomainTestBuilderBase<DoubleGenericTest>
 {
     public DoubleGenericTestBuilder WithIds(DoubleGeneric<char, decimal> ids)
@@ -27,7 +26,6 @@ public class DoubleGenericTestBuilder : DomainTestBuilderBase<DoubleGenericTest>
         FillConstructorWith(nameof(ids), ids);
         return this;
     }
-}
-";
+}";
     }
 }

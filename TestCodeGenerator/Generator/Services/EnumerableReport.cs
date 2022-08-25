@@ -11,7 +11,7 @@ public class EnumerableReport
             return;
         }
 
-        if (type.IsInterface && type.GetGenericTypeDefinition() == typeof(IEnumerable<>))
+        if (type.IsInterface && type.IsGenericType && type.GetGenericTypeDefinition() == typeof(IEnumerable<>))
         {
             IsIEnumerable = true;
             ImplementsIEnumerable = false;

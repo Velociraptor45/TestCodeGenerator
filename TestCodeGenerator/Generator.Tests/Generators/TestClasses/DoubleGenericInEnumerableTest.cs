@@ -20,7 +20,6 @@ using TestCodeGenerator.Generator.Tests.Generators.Subclasses;
 using TestCodeGenerator.Generator.Tests.Generators.TestClasses;
 
 namespace TestCodeGenerator.Generator.Tests.Tests.Generators.TestClasses;
-
 public class DoubleGenericInEnumerableTestBuilder : DomainTestBuilderBase<DoubleGenericInEnumerableTest>
 {
     public DoubleGenericInEnumerableTestBuilder WithIds(IEnumerable<DoubleGeneric<char, long>> ids)
@@ -33,7 +32,6 @@ public class DoubleGenericInEnumerableTestBuilder : DomainTestBuilderBase<Double
     {
         return WithIds(Enumerable.Empty<DoubleGeneric<char, long>>());
     }
-}
-";
+}";
     }
 }

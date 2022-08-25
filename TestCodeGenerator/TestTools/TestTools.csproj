@@ -4,11 +4,7 @@
     <TargetFramework>net6.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <RootNamespace>TestCodeGenerator.Generator</RootNamespace>
+    <RootNamespace>TestCodeGenerator.TestTools</RootNamespace>
   </PropertyGroup>
-
-  <ItemGroup>
-    <PackageReference Include="RefleCS" Version="0.1.0-alpha.3" />
-  </ItemGroup>
 
 </Project>
