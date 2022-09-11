@@ -134,6 +134,8 @@ public class TestBuilderGeneratorTests
 
         public void SetupFileHandlerLoadingAssembly()
         {
+            TestPropertyNotSetException.ThrowIfNull(_builderConfiguration);
+
             _fileHandlerMock.Setup(m => m.LoadAssembly(_builderConfiguration.DllPath))
                 .Returns(_assembly);
         }
