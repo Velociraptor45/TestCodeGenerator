@@ -1,4 +1,4 @@
-﻿namespace TestCodeGenerator.Generator.Services;
+﻿namespace TestCodeGenerator.Generator.Models;
 
 public class EnumerableReport
 {

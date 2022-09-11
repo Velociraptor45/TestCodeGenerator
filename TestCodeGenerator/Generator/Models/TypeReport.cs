@@ -1,7 +1,7 @@
 ﻿using System.Reflection;
 using System.Text;
 
-namespace TestCodeGenerator.Generator.Services;
+namespace TestCodeGenerator.Generator.Models;
 
 public class TypeReport
 {

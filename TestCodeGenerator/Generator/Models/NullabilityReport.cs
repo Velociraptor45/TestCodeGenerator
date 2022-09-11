@@ -1,6 +1,6 @@
 ﻿using System.Reflection;
 
-namespace TestCodeGenerator.Generator.Services;
+namespace TestCodeGenerator.Generator.Models;
 
 public class NullabilityReport
 {
