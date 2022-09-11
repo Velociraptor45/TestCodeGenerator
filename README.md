@@ -1,5 +1,5 @@
 # TestCodeGenerator
-The TestCodeGenerator will automatically generate C# builder classes for a given type (see [builder pattern](https://refactoring.guru/design-patterns/builder)). This is ideally combined with AutoFixture for random test data generation.<br/>
+The TestCodeGenerator generates C# builder classes for a given type (see [builder pattern](https://refactoring.guru/design-patterns/builder)). This is ideally combined with AutoFixture for random test data generation.<br/>
 The generated builders will not build the object itself but rather provide the "With" methods and delegate the rest to a generic base class that you have to supply.
 
 ## Features
@@ -15,7 +15,7 @@ The generated builders will not build the object itself but rather provide the "
 - No `WithEmpty` support for interfaces that inherit from `IEnumerable<T>` as parameter types e.g. `IList<T>`
 
 ## Cli Arguments
-- `-c` | `--class` <br/>
+- `-c | --class` <br/>
 The name of the class you want to create a builder for
 - `-s | --settings` <br/>
 The name of settings object that you want to use in your appsettings file
@@ -62,7 +62,7 @@ provide the following settings in your appsettings.json
 and call TestCodeGenerator with
 
 ```
-TestCodeGenerator.exe -c "Item" -s "Domain"
+Console.exe -c "Item" -s "Domain"
 ```
 
 it will generate this builder:
