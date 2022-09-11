@@ -4,6 +4,7 @@ using System.Reflection;
 using TestCodeGenerator.Generator.Configurations;
 using TestCodeGenerator.Generator.Files;
 using TestCodeGenerator.Generator.Generators;
+using TestCodeGenerator.Generator.Modules.TestBuilder;
 using TestCodeGenerator.Generator.Tests.Generators.TestClasses;
 using TestCodeGenerator.TestTools;
 using TestCodeGenerator.TestTools.Exceptions;
@@ -116,7 +117,11 @@ public class TestBuilderGeneratorTests
         {
             TestPropertyNotSetException.ThrowIfNull(_builderConfiguration);
 
-            return new TestBuilderGenerator(_fileHandlerMock.Object, new CsFileHandler(), _builderConfiguration);
+            return new TestBuilderGenerator(_fileHandlerMock.Object, new CsFileHandler(), _builderConfiguration,
+                new List<ITestBuilderModule>
+                {
+                    new CtorParameterModule(_builderConfiguration)
+                });
         }
 
         public void SetupBuilderConfiguration(string outputFolder)
