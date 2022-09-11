@@ -1,4 +1,4 @@
-﻿namespace TestCodeGenerator.Generator.Tests.Generators.TestClasses;
+﻿namespace TestCodeGenerator.Generator.Tests.Generators.TestClasses.CtorParameterModule;
 
 [System.Diagnostics.CodeAnalysis.SuppressMessage("Major Code Smell", "S1118:Utility classes should not have public constructors", Justification = "<Pending>")]
 public class DuplicatedCtorParameterTypesTest
@@ -16,9 +16,9 @@ public class DuplicatedCtorParameterTypesTest
         return @"using Superclass.Namespace;
 using System;
 using System.Collections.Generic;
-using TestCodeGenerator.Generator.Tests.Generators.TestClasses;
+using TestCodeGenerator.Generator.Tests.Generators.TestClasses.CtorParameterModule;
 
-namespace TestCodeGenerator.Generator.Tests.Tests.Generators.TestClasses;
+namespace TestCodeGenerator.Generator.Tests.Tests.Generators.TestClasses.CtorParameterModule;
 public class DuplicatedCtorParameterTypesTestBuilder : DomainTestBuilderBase<DuplicatedCtorParameterTypesTest>
 {
     public DuplicatedCtorParameterTypesTestBuilder WithIds(int ids)
