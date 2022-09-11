@@ -34,7 +34,8 @@ Parser.Default.ParseArguments<CliOptions>(args)
         new TestBuilderGenerator(new FileHandler(), new CsFileHandler(), config,
                 new List<ITestBuilderModule>
                 {
-                    new CtorParameterModule(config)
+                    new CtorParameterModule(config),
+                    new PublicPropertyModule(config)
                 })
             .Generate(o.ClassName);
     });

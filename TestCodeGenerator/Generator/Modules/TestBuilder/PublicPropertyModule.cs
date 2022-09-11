@@ -6,64 +6,59 @@ using TestCodeGenerator.Generator.Services;
 
 namespace TestCodeGenerator.Generator.Modules.TestBuilder;
 
-public class CtorParameterModule : ITestBuilderModule
+public class PublicPropertyModule : ITestBuilderModule
 {
     private readonly BuilderConfiguration _config;
 
-    public CtorParameterModule(BuilderConfiguration config)
+    public PublicPropertyModule(BuilderConfiguration config)
     {
         _config = config;
     }
 
     public void Apply(Type type, string builderClassName, Class cls, Namespaces namespaces)
     {
-        var parameters = new Dictionary<(string, string), ParameterInfo>();
+        var properties = new Dictionary<(string, string), PropertyInfo>();
 
-        foreach (var ctor in type.GetConstructors())
+        foreach (var property in type.GetProperties(BindingFlags.Public | BindingFlags.Instance).Where(p => p.CanWrite))
         {
-            foreach (var parameter in ctor.GetParameters())
-            {
-                var key = (parameter.Name!, parameter.ParameterType.FullName!);
-                if (parameters.ContainsKey(key))
-                    continue;
-
-                parameters.Add(key, parameter);
-            }
+            var key = (property.Name, property.PropertyType.FullName!);
+            properties.Add(key, property);
         }
 
-        foreach (var info in parameters.Values)
+        foreach (var info in properties.Values)
         {
             AddMethod(info, builderClassName, cls, namespaces);
         }
     }
 
-    private void AddMethod(ParameterInfo param, string builderClassName, Class cls, Namespaces namespaces)
+    private void AddMethod(PropertyInfo prop, string builderClassName, Class cls, Namespaces namespaces)
     {
         NullabilityInfoContext context = new();
-        var nullabilityInfo = context.Create(param);
-        var typeReport = new TypeReport(param.ParameterType, nullabilityInfo);
+        var nullabilityInfo = context.Create(prop);
+        var typeReport = new TypeReport(prop.PropertyType, nullabilityInfo);
         namespaces.AddRange(typeReport.GetAllNamespaces());
 
         if (typeReport.EnumerableReport.IsOrImplementsIEnumerable)
         {
-            AddEnumerableParameterMethods(param.Name!, typeReport, builderClassName, cls);
+            AddEnumerableParameterMethods(prop.Name, typeReport, builderClassName, cls);
             return;
         }
 
-        AddMethod(param.Name!, typeReport, builderClassName, cls);
+        AddMethod(prop.Name, typeReport, builderClassName, cls);
     }
 
     private void AddMethod(string name, TypeReport typeReport, string builderClassName, Class cls)
     {
         var capitalizedName = CapitalizeFirstLetter(name);
+        var lowercasedName = LowercaseFirstLetter(name);
 
         var method = Method.Public(
             builderClassName,
             $"With{capitalizedName}",
-            new List<Parameter> { new(typeReport.GetFullName(), name) },
+            new List<Parameter> { new(typeReport.GetFullName(), lowercasedName) },
             new List<Statement>
             {
-                new($"{_config.CtorInjectionMethodName}(nameof({name}), {name});"),
+                new($"{_config.PropertyInjectionMethodName}(p => p.{name}, {lowercasedName});"),
                 new("return this;")
             });
         cls.AddMethod(method);
@@ -82,15 +77,16 @@ public class CtorParameterModule : ITestBuilderModule
         Class cls)
     {
         var capitalizedName = CapitalizeFirstLetter(name);
+        var lowercasedName = LowercaseFirstLetter(name);
 
         // With
         var withMethod = Method.Public(
             builderClassName,
             $"With{capitalizedName}",
-            new List<Parameter> { new(typeReport.GetFullName(), name) },
+            new List<Parameter> { new(typeReport.GetFullName(), lowercasedName) },
             new List<Statement>
             {
-                new($"{_config.CtorInjectionMethodName}(nameof({name}), {name});"),
+                new($"{_config.PropertyInjectionMethodName}(p => p.{name}, {lowercasedName});"),
                 new("return this;")
             });
         cls.AddMethod(withMethod);
@@ -109,7 +105,7 @@ public class CtorParameterModule : ITestBuilderModule
         else
         {
             Console.WriteLine(
-                $"No standard ctor found for type {typeReport.Type.Name}. Skipping 'WithEmpty' method");
+                $"No standard ctor found for type {typeReport.GetFullName()}. Skipping 'WithEmpty' method");
         }
 
         // Without
@@ -145,5 +141,10 @@ public class CtorParameterModule : ITestBuilderModule
     private string CapitalizeFirstLetter(string name)
     {
         return string.Concat(name[0].ToString().ToUpper(), name.AsSpan(1));
+    }
+
+    private string LowercaseFirstLetter(string name)
+    {
+        return string.Concat(name[0].ToString().ToLower(), name.AsSpan(1));
     }
 }
