@@ -3,7 +3,8 @@ The TestCodeGenerator generates C# builder classes for a given type (see [builde
 The generated builders will not build the object itself but rather provide the "With" methods and delegate the rest to a generic base class that you have to supply.
 
 ## Features
-- Detect multiple constructors and deduplicate parameters
+- Generates methods for ctor parameters and publicly mutable properties
+- Detect multiple constructors and deduplicate parameters/properties
 - Detect & handle non-generic parameter types that inherit from `IEnumerable<T>`, e.g. `List<T>`, `Dictionary<T1, T2>` or your own custom implementations
 - Detect & handle nullable parameter types
 - Support for generic types as generic type argument e.g. `IEnumerable<IEnumerable<int>>`
@@ -18,7 +19,35 @@ The generated builders will not build the object itself but rather provide the "
 - `-c | --class` <br/>
 The name of the class you want to create a builder for
 - `-s | --settings` <br/>
-The name of settings object that you want to use in your appsettings file
+The name of settings group in your appsettings file that you want to use
+
+## appsetting configuration
+You have to provide a set of settings in order to let the TestCodeGenerator know about classes, namespaces and methods. A dummy examply can be found under `TestCodeGenerator/Console/appsettings.json`
+
+### Name
+The name of the settings group that is used for the `-s` CLI command
+
+### DllPath
+The absolute path to the dll where your class is located
+
+### OutputFolder
+The folder where the builder class file will be created
+
+### GenericSuperclassTypeName
+The name of the superclass that the newly created builder class should inherit from
+
+### GenericSuperclassNamespace
+The namespace of the class specified in `GenericSuperclassTypeName`
+
+### CtorInjectionMethodName
+The method in the superclass that is used for ctor injections
+
+### PropertyInjectionMethodName
+The method in the superclass that is used for property injections
+
+### OutputAssemblyRootNamespace
+The root namespace of the assembly where the newly created builder class should be placed in
+
 
 ## Example
 Let's say you have the following model,
@@ -106,4 +135,14 @@ public class ItemBuilder : DomainTestBuilderBase<Item>
         return WithTimesBought(null);
     }
 }
+```
+
+## Troubleshooting
+
+### The dll could not be loaded
+If the dll could not be loaded, you might be missing other dlls that your dll is referencing. .net sometimes needs these dlls in the same directory as your dll. Try adding this to your `.csproj` file and recompile. This will place all the dlls your dll is depending on in the same output directory
+```
+<PropertyGroup>
+  <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+</PropertyGroup>
 ```
