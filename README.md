@@ -10,6 +10,7 @@ The generated builders will not build the object itself but rather provide the "
 - Support for generic types as generic type argument e.g. `IEnumerable<IEnumerable<int>>`
 - Generate `WithEmpty` method for parameter types inheriting from `IEnumerable<T>` if they are classes
 - Generate `Without` method for nullable parameter types
+- Detect differences to an exising file and keep defined methods (see [here](#prevent-overwriting-methods))
 
 ## Limitations
 - Nullability is currently only handled for parameter types that are explicitely labeled as nullable with a `?`
@@ -133,6 +134,22 @@ public class ItemBuilder : DomainTestBuilderBase<Item>
     public ItemBuilder WithoutTimesBought()
     {
         return WithTimesBought(null);
+    }
+}
+```
+
+## Prevent overwriting methods
+The TestCodeGenerator can detect whether there is already an existing file at the output location and analyzes it (only supported with file-scoped namespaces). If the file does not contain the class the TestCodeGenerator is going to generate, then a new class will be added. Otherwise all methods from the existing class will be removed and overwritten. However, if you want to keep certain methods you have to leave the comment `TCG keep` above it, e.g.
+```cs
+public class ItemBuilder
+{
+    // TCG keep
+    public void Init() // this method will be kept
+    {
+    }
+    
+    public void AnotherInit() // this method will be removed
+    {
     }
 }
 ```
