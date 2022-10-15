@@ -16,7 +16,7 @@ public class TestBuilderGenerator
     private readonly ICsFileHandler _csFileHandler;
     private readonly BuilderConfiguration _config;
     private readonly List<ITestBuilderModule> _modules;
-    private readonly Namespaces _namespaces = new();
+    private readonly Namespaces _usings = new();
 
     public TestBuilderGenerator(IFileHandler fileHandler, ICsFileHandler csFileHandler, BuilderConfiguration config,
         IEnumerable<ITestBuilderModule> modules)
@@ -29,7 +29,7 @@ public class TestBuilderGenerator
 
     public void Generate(string typeName)
     {
-        _namespaces.Add(_config.GenericSuperclassNamespace);
+        _usings.Add(_config.GenericSuperclassNamespace);
 
         var assembly = _fileHandler.LoadAssembly(_config.DllPath);
 
@@ -41,30 +41,52 @@ public class TestBuilderGenerator
             throw new ArgumentException($"More than one class with type name '{typeName}' found. Further distinction is currently not implemented", nameof(typeName));
 
         var type = types.Single();
-        _namespaces.Add(type.Namespace!);
+        _usings.Add(type.Namespace!);
 
         var builderClassName = GenerateBuilderClassName(type);
-        var file = GenerateFile(type, builderClassName);
-        _csFileHandler.SaveOrReplace(file, Path.Combine(_config.OutputFolder, $"{builderClassName}.cs"));
+        var builderFilePath = Path.Combine(_config.OutputFolder, $"{builderClassName}.cs");
+
+        var file = _fileHandler.FileExits(builderFilePath)
+            ? _csFileHandler.FromFile(builderFilePath)
+            : new CsFile(Enumerable.Empty<Using>(), new Namespace(GetBuilderClassNamespace(type)));
+
+        UpdateFile(file, type, builderClassName);
+        _csFileHandler.SaveOrReplace(file, builderFilePath);
     }
 
-    private CsFile GenerateFile(Type type, string builderClassName)
+    private void UpdateFile(CsFile file, Type type, string builderClassName)
     {
-        var cls = Class.Public(builderClassName);
+        var cls = file.Nmsp.Classes.FirstOrDefault(c => c.Name == builderClassName);
+
+        if (cls is null)
+        {
+            cls = Class.Public(builderClassName);
+            file.Nmsp.AddClass(cls);
+        }
+
+        cls.RemoveAllBaseTypes();
         cls.AddBaseType(new BaseType($"{_config.GenericSuperclassTypeName}<{type.Name}>"));
+
+        var methodsToRemove = cls.Methods
+            .Where(m => !m.LeadingComments.Any(c => c.Value.ToLower().Contains("tcg keep")))
+            .ToArray();
+
+        foreach (var method in methodsToRemove)
+        {
+            cls.RemoveMethod(method);
+        }
 
         foreach (var module in _modules)
         {
-            module.Apply(type, builderClassName, cls, _namespaces);
+            module.Apply(type, builderClassName, cls, _usings);
         }
 
-        var nmsp = new Namespace(GetBuilderClassNamespace(type), new List<Class> { cls });
+        foreach (var @using in _usings)
+        {
+            file.AddUsing(new Using(@using));
+        }
 
-        var file = new CsFile(
-            _namespaces.OrderBy(n => n).Select(n => new Using(n)),
-            nmsp);
-
-        return file;
+        file.OrderUsingsAsc();
     }
 
     private string GetBuilderClassNamespace(Type type)

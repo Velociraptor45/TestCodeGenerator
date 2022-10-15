@@ -7,6 +7,7 @@ using TestCodeGenerator.Generator.Generators;
 using TestCodeGenerator.Generator.Modules.TestBuilder;
 using TestCodeGenerator.Generator.Tests.Generators.TestClasses.CtorParameterModule;
 using TestCodeGenerator.Generator.Tests.Generators.TestClasses.CustomizedBuilderName;
+using TestCodeGenerator.Generator.Tests.Generators.TestClasses.ExistingFile;
 using TestCodeGenerator.Generator.Tests.Generators.TestClasses.PublicPropertyModule;
 using TestCodeGenerator.TestTools;
 using TestCodeGenerator.TestTools.Exceptions;
@@ -20,6 +21,22 @@ public class TestBuilderGeneratorTests
     public TestBuilderGeneratorTests()
     {
         _fixture = new TestBuilderGeneratorFixture();
+    }
+
+    public static IEnumerable<object?[]> GenerateWithExistingFileTestData()
+    {
+        yield return new object[]
+        {
+            nameof(ExistingFileTest),
+            ExistingFileTest.GetExpectedBuilder(),
+            ExistingFileTest.GetExistingBuilder()
+        };
+        yield return new object[]
+        {
+            nameof(ExistingFileWithMethodToKeepTest),
+            ExistingFileWithMethodToKeepTest.GetExpectedBuilder(),
+            ExistingFileWithMethodToKeepTest.GetExistingBuilder()
+        };
     }
 
     public static IEnumerable<object?[]> GenerateWithBuilderNameCustomizationTestData()
@@ -184,6 +201,8 @@ public class TestBuilderGeneratorTests
         {
             // Arrange
             var filePath = Path.Combine(folderPath, $"{className}Builder.cs");
+
+            _fixture.SetupFileNotExisting(filePath);
             _fixture.SetupBuilderConfiguration(folderPath);
             _fixture.SetupFileHandlerLoadingAssembly();
             var sut = _fixture.CreateSut();
@@ -201,13 +220,15 @@ public class TestBuilderGeneratorTests
 
     [Theory]
     [MemberData(nameof(GenerateWithBuilderNameCustomizationTestData))]
-    public void Generate_WithValidBuilderNameCustomization_ShouldThrow(string className, string expectedBuilder,
+    public void Generate_WithValidBuilderNameCustomization_ShouldSaveExpectedResult(string className, string expectedBuilder,
         string? builderNamePattern, string fileName)
     {
         TestFolder.CreateTemp(folderPath =>
         {
             // Arrange
             var filePath = Path.Combine(folderPath, $"{fileName}.cs");
+
+            _fixture.SetupFileNotExisting(filePath);
             _fixture.SetupBuilderConfiguration(folderPath, builderNamePattern);
             _fixture.SetupFileHandlerLoadingAssembly();
             var sut = _fixture.CreateSut();
@@ -224,7 +245,7 @@ public class TestBuilderGeneratorTests
     }
 
     [Fact]
-    public void Generate_WithInvalidBuilderNameCustomization_ShouldSaveExpectedResult()
+    public void Generate_WithInvalidBuilderNameCustomization_ShouldThrow()
     {
         TestFolder.CreateTemp(folderPath =>
         {
@@ -239,6 +260,34 @@ public class TestBuilderGeneratorTests
             // Assert
             func.Should().ThrowExactly<InvalidOperationException>()
                 .WithMessage("The given builder name pattern does not provide a valid C# class name");
+        });
+    }
+
+    [Theory]
+    [MemberData(nameof(GenerateWithExistingFileTestData))]
+    public void Generate_WithExistingFile_ShouldSaveExpectedResult(string className, string expectedBuilder,
+        string existingBuilder)
+    {
+        TestFolder.CreateTemp(folderPath =>
+        {
+            // Arrange
+            var filePath = Path.Combine(folderPath, $"{className}Builder.cs");
+
+            File.WriteAllText(filePath, existingBuilder);
+
+            _fixture.SetupFileExisting(filePath);
+            _fixture.SetupBuilderConfiguration(folderPath);
+            _fixture.SetupFileHandlerLoadingAssembly();
+            var sut = _fixture.CreateSut();
+
+            // Act
+            sut.Generate(className);
+
+            // Assert
+            File.Exists(filePath).Should().BeTrue();
+
+            var fileContent = File.ReadAllText(filePath);
+            fileContent.Should().Be(expectedBuilder);
         });
     }
 
@@ -286,6 +335,16 @@ public class TestBuilderGeneratorTests
 
             _fileHandlerMock.Setup(m => m.LoadAssembly(_builderConfiguration.DllPath))
                 .Returns(_assembly);
+        }
+
+        public void SetupFileExisting(string filePath)
+        {
+            _fileHandlerMock.Setup(m => m.FileExits(filePath)).Returns(true);
+        }
+
+        public void SetupFileNotExisting(string filePath)
+        {
+            _fileHandlerMock.Setup(m => m.FileExits(filePath)).Returns(false);
         }
     }
 }
