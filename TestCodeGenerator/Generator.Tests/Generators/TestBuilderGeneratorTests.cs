@@ -136,6 +136,18 @@ public class TestBuilderGeneratorTests
         {
             nameof(DuplicatedCtorParameterTypesTest), DuplicatedCtorParameterTypesTest.GetExpectedBuilder()
         };
+        yield return new object[]
+        {
+            nameof(PrivatePropertyTest), PrivatePropertyTest.GetExpectedBuilder()
+        };
+        yield return new object[]
+        {
+            nameof(GetOnlyPropertyTest), GetOnlyPropertyTest.GetExpectedBuilder()
+        };
+        yield return new object[]
+        {
+            nameof(PrivateSetPropertyTest), PrivateSetPropertyTest.GetExpectedBuilder()
+        };
     }
 
     [Theory]

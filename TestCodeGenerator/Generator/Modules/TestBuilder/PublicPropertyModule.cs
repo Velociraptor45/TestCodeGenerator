@@ -19,7 +19,11 @@ public class PublicPropertyModule : TestBuilderModuleBase
     {
         var properties = new Dictionary<(string, string), PropertyInfo>();
 
-        foreach (var property in type.GetProperties(BindingFlags.Public | BindingFlags.Instance).Where(p => p.CanWrite))
+        var publicSetProperties = type
+            .GetProperties(BindingFlags.Public | BindingFlags.Instance)
+            .Where(p => p.GetSetMethod() != null);
+
+        foreach (var property in publicSetProperties)
         {
             var key = (property.Name, property.PropertyType.FullName!);
             properties.Add(key, property);
