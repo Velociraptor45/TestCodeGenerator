@@ -6,6 +6,7 @@ using TestCodeGenerator.Generator.Files;
 using TestCodeGenerator.Generator.Generators;
 using TestCodeGenerator.Generator.Modules.TestBuilder;
 using TestCodeGenerator.Generator.Tests.Generators.TestClasses.CtorParameterModule;
+using TestCodeGenerator.Generator.Tests.Generators.TestClasses.CustomizedBuilderName;
 using TestCodeGenerator.Generator.Tests.Generators.TestClasses.PublicPropertyModule;
 using TestCodeGenerator.TestTools;
 using TestCodeGenerator.TestTools.Exceptions;
@@ -19,6 +20,31 @@ public class TestBuilderGeneratorTests
     public TestBuilderGeneratorTests()
     {
         _fixture = new TestBuilderGeneratorFixture();
+    }
+
+    public static IEnumerable<object?[]> GenerateWithBuilderNameCustomizationTestData()
+    {
+        yield return new object[]
+        {
+            nameof(WithClassNamePatternTest),
+            WithClassNamePatternTest.GetExpectedBuilder(),
+            WithClassNamePatternTest.GetBuilderNamePattern(),
+            WithClassNamePatternTest.GetFileName()
+        };
+        yield return new object?[]
+        {
+            nameof(WithoutClassNamePatternTest),
+            WithoutClassNamePatternTest.GetExpectedBuilder(),
+            WithoutClassNamePatternTest.GetBuilderNamePattern(),
+            WithoutClassNamePatternTest.GetFileName()
+        };
+        yield return new object[]
+        {
+            nameof(WithStaticClassNamePatternTest),
+            WithStaticClassNamePatternTest.GetExpectedBuilder(),
+            WithStaticClassNamePatternTest.GetBuilderNamePattern(),
+            WithStaticClassNamePatternTest.GetFileName()
+        };
     }
 
     public static IEnumerable<object[]> GenerateTestData()
@@ -152,7 +178,7 @@ public class TestBuilderGeneratorTests
 
     [Theory]
     [MemberData(nameof(GenerateTestData))]
-    public void Generate_WithIntCtor_ShouldSaveExpectedResult(string className, string expectedBuilder)
+    public void Generate_ShouldSaveExpectedResult(string className, string expectedBuilder)
     {
         TestFolder.CreateTemp(folderPath =>
         {
@@ -170,6 +196,49 @@ public class TestBuilderGeneratorTests
 
             var fileContent = File.ReadAllText(filePath);
             fileContent.Should().Be(expectedBuilder);
+        });
+    }
+
+    [Theory]
+    [MemberData(nameof(GenerateWithBuilderNameCustomizationTestData))]
+    public void Generate_WithValidBuilderNameCustomization_ShouldThrow(string className, string expectedBuilder,
+        string? builderNamePattern, string fileName)
+    {
+        TestFolder.CreateTemp(folderPath =>
+        {
+            // Arrange
+            var filePath = Path.Combine(folderPath, $"{fileName}.cs");
+            _fixture.SetupBuilderConfiguration(folderPath, builderNamePattern);
+            _fixture.SetupFileHandlerLoadingAssembly();
+            var sut = _fixture.CreateSut();
+
+            // Act
+            sut.Generate(className);
+
+            // Assert
+            File.Exists(filePath).Should().BeTrue();
+
+            var fileContent = File.ReadAllText(filePath);
+            fileContent.Should().Be(expectedBuilder);
+        });
+    }
+
+    [Fact]
+    public void Generate_WithInvalidBuilderNameCustomization_ShouldSaveExpectedResult()
+    {
+        TestFolder.CreateTemp(folderPath =>
+        {
+            // Arrange
+            _fixture.SetupBuilderConfiguration(folderPath, "{ClassName}with/=Builder");
+            _fixture.SetupFileHandlerLoadingAssembly();
+            var sut = _fixture.CreateSut();
+
+            // Act
+            var func = () => sut.Generate(nameof(WithClassNamePatternTest));
+
+            // Assert
+            func.Should().ThrowExactly<InvalidOperationException>()
+                .WithMessage("The given builder name pattern does not provide a valid C# class name");
         });
     }
 
@@ -196,7 +265,7 @@ public class TestBuilderGeneratorTests
                 });
         }
 
-        public void SetupBuilderConfiguration(string outputFolder)
+        public void SetupBuilderConfiguration(string outputFolder, string? builderNamePattern = null)
         {
             _builderConfiguration = new BuilderConfiguration
             {
@@ -206,7 +275,8 @@ public class TestBuilderGeneratorTests
                 GenericSuperclassNamespace = "Superclass.Namespace",
                 CtorInjectionMethodName = "FillConstructorWith",
                 PropertyInjectionMethodName = "FillPropertyWith",
-                OutputAssemblyRootNamespace = "TestCodeGenerator.Generator.Tests.Tests"
+                OutputAssemblyRootNamespace = "TestCodeGenerator.Generator.Tests.Tests",
+                BuilderNamePattern = builderNamePattern
             };
         }
 
