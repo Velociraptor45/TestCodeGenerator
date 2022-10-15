@@ -10,4 +10,5 @@ public class BuilderConfiguration
     public string CtorInjectionMethodName { get; init; } = string.Empty;
     public string PropertyInjectionMethodName { get; init; } = string.Empty;
     public string OutputAssemblyRootNamespace { get; init; } = string.Empty;
+    public string? BuilderNamePattern { get; init; } = null;
 }

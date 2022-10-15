@@ -1,5 +1,6 @@
 ﻿using RefleCS;
 using RefleCS.Nodes;
+using System.Text.RegularExpressions;
 using TestCodeGenerator.Generator.Configurations;
 using TestCodeGenerator.Generator.Files;
 using TestCodeGenerator.Generator.Models;
@@ -9,6 +10,8 @@ namespace TestCodeGenerator.Generator.Generators;
 
 public class TestBuilderGenerator
 {
+    private readonly Regex _csClassNameRegex = new(@"^[A-Za-z_][A-Za-z0-9_]*$");
+
     private readonly IFileHandler _fileHandler;
     private readonly ICsFileHandler _csFileHandler;
     private readonly BuilderConfiguration _config;
@@ -40,14 +43,13 @@ public class TestBuilderGenerator
         var type = types.Single();
         _namespaces.Add(type.Namespace!);
 
-        var file = GenerateFile(type);
-        _csFileHandler.SaveOrReplace(file, Path.Combine(_config.OutputFolder, $"{type.Name}Builder.cs"));
+        var builderClassName = GenerateBuilderClassName(type);
+        var file = GenerateFile(type, builderClassName);
+        _csFileHandler.SaveOrReplace(file, Path.Combine(_config.OutputFolder, $"{builderClassName}.cs"));
     }
 
-    private CsFile GenerateFile(Type type)
+    private CsFile GenerateFile(Type type, string builderClassName)
     {
-        var builderClassName = $"{type.Name}Builder";
-
         var cls = Class.Public(builderClassName);
         cls.AddBaseType(new BaseType($"{_config.GenericSuperclassTypeName}<{type.Name}>"));
 
@@ -79,5 +81,19 @@ public class TestBuilderGenerator
         }
 
         throw new InvalidOperationException("Namespace detection failed. Debug me");
+    }
+
+    private string GenerateBuilderClassName(Type type)
+    {
+        if (string.IsNullOrWhiteSpace(_config.BuilderNamePattern))
+            return $"{type.Name}Builder";
+
+        var builderClassName = _config.BuilderNamePattern.Replace("{ClassName}", type.Name);
+
+        if (!_csClassNameRegex.IsMatch(builderClassName))
+            throw new InvalidOperationException(
+                "The given builder name pattern does not provide a valid C# class name");
+
+        return builderClassName;
     }
 }
