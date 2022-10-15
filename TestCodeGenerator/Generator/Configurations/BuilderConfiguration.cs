@@ -8,5 +8,6 @@ public class BuilderConfiguration
     public string GenericSuperclassTypeName { get; init; } = string.Empty;
     public string GenericSuperclassNamespace { get; init; } = string.Empty;
     public string CtorInjectionMethodName { get; init; } = string.Empty;
+    public string PropertyInjectionMethodName { get; init; } = string.Empty;
     public string OutputAssemblyRootNamespace { get; init; } = string.Empty;
 }

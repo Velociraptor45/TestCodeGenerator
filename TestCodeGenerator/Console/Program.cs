@@ -5,6 +5,7 @@ using TestCodeGenerator.Console;
 using TestCodeGenerator.Generator.Configurations;
 using TestCodeGenerator.Generator.Files;
 using TestCodeGenerator.Generator.Generators;
+using TestCodeGenerator.Generator.Modules.TestBuilder;
 
 Parser.Default.ParseArguments<CliOptions>(args)
     .WithParsed(o =>
@@ -29,6 +30,12 @@ Parser.Default.ParseArguments<CliOptions>(args)
             return;
         }
 
-        new TestBuilderGenerator(new FileHandler(), new CsFileHandler(), configsMatchingName.First())
+        var config = configsMatchingName.First();
+        new TestBuilderGenerator(new FileHandler(), new CsFileHandler(), config,
+                new List<ITestBuilderModule>
+                {
+                    new CtorParameterModule(config),
+                    new PublicPropertyModule(config)
+                })
             .Generate(o.ClassName);
     });
