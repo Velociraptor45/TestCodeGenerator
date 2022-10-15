@@ -8,4 +8,9 @@ public class FileHandler : IFileHandler
     {
         return Assembly.LoadFrom(dllPath);
     }
+
+    public bool FileExits(string filePath)
+    {
+        return File.Exists(filePath);
+    }
 }
