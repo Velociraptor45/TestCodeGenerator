@@ -49,6 +49,8 @@ The method in the superclass that is used for property injections
 ### OutputAssemblyRootNamespace
 The root namespace of the assembly where the newly created builder class should be placed in
 
+### BuilderNamePattern (optional)
+The pattern with which the builder class name is generated. Use `{ClassName}` as the placeholder for the class's name for which you are generating the builder. Omit it for the default pattern `{ClassName}Builder`
 
 ## Example
 Let's say you have the following model,
@@ -66,6 +68,8 @@ public class Item
     {
         // parameter assignment
     }
+    
+    public double Price { get; set; }
 
     // here is the rest of your model's code
 }
@@ -83,7 +87,9 @@ provide the following settings in your appsettings.json
       "GenericSuperclassTypeName": "DomainTestBuilderBase",
       "GenericSuperclassNamespace": "MyProject.Domain.TestKit.Common",
       "CtorInjectionMethodName": "FillConstructorWith",
-      "OutputAssemblyRootNamespace": "MyProject.Domain.TestKit"
+      "PropertyInjectionMethodName": "FillPropertyWith",
+      "OutputAssemblyRootNamespace": "MyProject.Domain.TestKit",
+      "BuilderNamePattern": "MyCool{ClassName}Builder"
     }
   ]
 }
@@ -106,34 +112,40 @@ using System.Collections.Generic;
 
 namespace MyProject.Domain.TestKit.Items.Models;
 
-public class ItemBuilder : DomainTestBuilderBase<Item>
+public class MyCoolItemBuilder : DomainTestBuilderBase<Item>
 {
-    public ItemBuilder WithId(ItemId id)
+    public MyCoolItemBuilder WithId(ItemId id)
     {
         FillConstructorWith(nameof(id), id);
         return this;
     }
 
-    public ItemBuilder WithAvailabilities(IEnumerable<IItemAvailability> availabilities)
+    public MyCoolItemBuilder WithAvailabilities(IEnumerable<IItemAvailability> availabilities)
     {
         FillConstructorWith(nameof(availabilities), availabilities);
         return this;
     }
 
-    public ItemBuilder WithEmptyAvailabilities()
+    public MyCoolItemBuilder WithEmptyAvailabilities()
     {
         return WithAvailabilities(Enumerable.Empty<IItemAvailability>());
     }
 
-    public ItemBuilder WithTimesBought(int? timesBought)
+    public MyCoolItemBuilder WithTimesBought(int? timesBought)
     {
         FillConstructorWith(nameof(timesBought), timesBought);
         return this;
     }
 
-    public ItemBuilder WithoutTimesBought()
+    public MyCoolItemBuilder WithoutTimesBought()
     {
         return WithTimesBought(null);
+    }
+    
+    public MyCoolItemBuilder WithPrice(double price)
+    {
+        FillPropertyWith(p => p.Price, price);
+        return this;
     }
 }
 ```
