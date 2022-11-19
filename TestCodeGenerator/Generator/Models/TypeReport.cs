@@ -5,17 +5,17 @@ namespace TestCodeGenerator.Generator.Models;
 
 public class TypeReport
 {
-    public TypeReport(Type type, NullabilityInfo nullabilityInfo)
+    public TypeReport(Type type, NullabilityInfo nullabilityInfo, bool nullabilityEnabled)
     {
         Type = type;
-        NullabilityReport = new NullabilityReport(type, nullabilityInfo);
+        NullabilityReport = new NullabilityReport(type, nullabilityInfo, nullabilityEnabled);
         EnumerableReport = new EnumerableReport(type);
 
-        GenericTypeArgs = GetTypeReportsForGenericArguments(type, nullabilityInfo).ToList();
+        GenericTypeArgs = GetTypeReportsForGenericArguments(type, nullabilityInfo, nullabilityEnabled).ToList();
     }
 
     private IEnumerable<TypeReport> GetTypeReportsForGenericArguments(Type type,
-        NullabilityInfo nullabilityInfo)
+        NullabilityInfo nullabilityInfo, bool nullabilityEnabled)
     {
         if (!type.IsGenericType || NullabilityReport.HasNullableGenericType)
             yield break;
@@ -24,7 +24,7 @@ public class TypeReport
 
         for (var i = 0; i < genArgs.Length; i++)
         {
-            yield return new TypeReport(genArgs[i], nullabilityInfo.GenericTypeArguments[i]);
+            yield return new TypeReport(genArgs[i], nullabilityInfo.GenericTypeArguments[i], nullabilityEnabled);
         }
     }
 
@@ -38,7 +38,7 @@ public class TypeReport
 
     public IEnumerable<string> GetAllNamespaces()
     {
-        var namespaces = new List<string> { Type.Namespace! };
+        var namespaces = new List<string> { GetNamespace() };
 
         if (!IsGeneric)
             return namespaces;
@@ -66,8 +66,7 @@ public class TypeReport
             }
         }
 
-        if (NullabilityReport.IsNullable)
-            builder.Append('?');
+        builder.Append(NullabilityReport.GetNullabilityPostfix());
 
         return builder.ToString();
     }
@@ -78,6 +77,16 @@ public class TypeReport
             return string.Empty;
 
         return string.Join(", ", GenericTypeArgs.Select(arg => arg.GetFullName()));
+    }
+
+    private string GetNamespace()
+    {
+        if (NullabilityReport.HasNullableGenericType)
+        {
+            return Type.GetGenericArguments().First().Namespace!;
+        }
+
+        return Type.Namespace!;
     }
 
     private static string ResolveTypeName(Type type)

@@ -7,11 +7,8 @@ namespace TestCodeGenerator.Generator.Modules.TestBuilder;
 
 public class CtorParameterModule : TestBuilderModuleBase
 {
-    private readonly BuilderConfiguration _config;
-
-    public CtorParameterModule(BuilderConfiguration config)
+    public CtorParameterModule(BuilderConfiguration config) : base(config)
     {
-        _config = config;
     }
 
     public override void Apply(Type type, string builderClassName, Class cls, Namespaces namespaces)
@@ -37,7 +34,7 @@ public class CtorParameterModule : TestBuilderModuleBase
 
     protected override Statement GetWithStatement(string originalName)
     {
-        return new($"{_config.CtorInjectionMethodName}(nameof({originalName}), {originalName});");
+        return new($"{Config.CtorInjectionMethodName}(nameof({originalName}), {originalName});");
     }
 
     protected override string GetParameterName(string originalName)
