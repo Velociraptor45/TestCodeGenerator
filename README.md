@@ -52,6 +52,9 @@ The root namespace of the assembly where the newly created builder class should 
 ### BuilderNamePattern (optional)
 The pattern with which the builder class name is generated. Use `{ClassName}` as the placeholder for the class's name for which you are generating the builder. Omit it for the default pattern `{ClassName}Builder`
 
+### NullabilityEnabled (optional)
+The indication whether the given class should be treated with enabled or disabled [nullability feature](https://learn.microsoft.com/en-us/dotnet/csharp/nullable-references). Default: `true`
+
 ## Example
 Let's say you have the following model,
 
