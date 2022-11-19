@@ -38,7 +38,7 @@ public class TypeReport
 
     public IEnumerable<string> GetAllNamespaces()
     {
-        var namespaces = new List<string> { Type.Namespace! };
+        var namespaces = new List<string> { GetNamespace() };
 
         if (!IsGeneric)
             return namespaces;
@@ -77,6 +77,16 @@ public class TypeReport
             return string.Empty;
 
         return string.Join(", ", GenericTypeArgs.Select(arg => arg.GetFullName()));
+    }
+
+    private string GetNamespace()
+    {
+        if (NullabilityReport.HasNullableGenericType)
+        {
+            return Type.GetGenericArguments().First().Namespace!;
+        }
+
+        return Type.Namespace!;
     }
 
     private static string ResolveTypeName(Type type)

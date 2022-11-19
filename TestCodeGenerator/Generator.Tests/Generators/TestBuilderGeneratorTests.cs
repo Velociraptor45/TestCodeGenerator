@@ -74,6 +74,16 @@ public class TestBuilderGeneratorTests
         };
         yield return new object[]
         {
+            nameof(StructParameterTest),
+            StructParameterTest.GetExpectedBuilder(),
+        };
+        yield return new object[]
+        {
+            nameof(NullableStructParameterTest),
+            NullableStructParameterTest.GetExpectedBuilder(),
+        };
+        yield return new object[]
+        {
             nameof(IntParameterForNullabilityTest),
             IntParameterForNullabilityTest.GetExpectedBuilder(),
         };
