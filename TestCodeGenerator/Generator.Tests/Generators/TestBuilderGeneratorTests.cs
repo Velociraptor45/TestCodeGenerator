@@ -9,6 +9,7 @@ using TestCodeGenerator.Generator.Tests.Generators.TestClasses.CtorParameterModu
 using TestCodeGenerator.Generator.Tests.Generators.TestClasses.CustomizedBuilderName;
 using TestCodeGenerator.Generator.Tests.Generators.TestClasses.ExistingFile;
 using TestCodeGenerator.Generator.Tests.Generators.TestClasses.PublicPropertyModule;
+using TestCodeGenerator.Generator.Tests.Generators.TestClasses.WithoutNullability;
 using TestCodeGenerator.TestTools;
 using TestCodeGenerator.TestTools.Exceptions;
 
@@ -61,6 +62,25 @@ public class TestBuilderGeneratorTests
             WithStaticClassNamePatternTest.GetExpectedBuilder(),
             WithStaticClassNamePatternTest.GetBuilderNamePattern(),
             WithStaticClassNamePatternTest.GetFileName()
+        };
+    }
+
+    public static IEnumerable<object?[]> GenerateWithoutNullabilityTestData()
+    {
+        yield return new object[]
+        {
+            nameof(ClassParameterTest),
+            ClassParameterTest.GetExpectedBuilder(),
+        };
+        yield return new object[]
+        {
+            nameof(IntParameterForNullabilityTest),
+            IntParameterForNullabilityTest.GetExpectedBuilder(),
+        };
+        yield return new object[]
+        {
+            nameof(NullableIntParameterForNullabilityTest),
+            NullableIntParameterForNullabilityTest.GetExpectedBuilder(),
         };
     }
 
@@ -291,6 +311,31 @@ public class TestBuilderGeneratorTests
         });
     }
 
+    [Theory]
+    [MemberData(nameof(GenerateWithoutNullabilityTestData))]
+    public void Generate_WithoutNullability_ShouldSaveExpectedResult(string className, string expectedBuilder)
+    {
+        TestFolder.CreateTemp(folderPath =>
+        {
+            // Arrange
+            var filePath = Path.Combine(folderPath, $"{className}Builder.cs");
+
+            _fixture.SetupFileNotExisting(filePath);
+            _fixture.SetupBuilderConfiguration(folderPath, nullabilityEnabled: false);
+            _fixture.SetupFileHandlerLoadingAssembly();
+            var sut = _fixture.CreateSut();
+
+            // Act
+            sut.Generate(className);
+
+            // Assert
+            File.Exists(filePath).Should().BeTrue();
+
+            var fileContent = File.ReadAllText(filePath);
+            fileContent.Should().Be(expectedBuilder);
+        });
+    }
+
     private class TestBuilderGeneratorFixture
     {
         private readonly Mock<IFileHandler> _fileHandlerMock = new(MockBehavior.Strict);
@@ -314,7 +359,8 @@ public class TestBuilderGeneratorTests
                 });
         }
 
-        public void SetupBuilderConfiguration(string outputFolder, string? builderNamePattern = null)
+        public void SetupBuilderConfiguration(string outputFolder, string? builderNamePattern = null,
+            bool nullabilityEnabled = true)
         {
             _builderConfiguration = new BuilderConfiguration
             {
@@ -325,7 +371,8 @@ public class TestBuilderGeneratorTests
                 CtorInjectionMethodName = "FillConstructorWith",
                 PropertyInjectionMethodName = "FillPropertyWith",
                 OutputAssemblyRootNamespace = "TestCodeGenerator.Generator.Tests.Tests",
-                BuilderNamePattern = builderNamePattern
+                BuilderNamePattern = builderNamePattern,
+                NullabilityEnabled = nullabilityEnabled
             };
         }
 
