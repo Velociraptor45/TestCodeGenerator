@@ -5,17 +5,17 @@ namespace TestCodeGenerator.Generator.Models;
 
 public class TypeReport
 {
-    public TypeReport(Type type, NullabilityInfo nullabilityInfo)
+    public TypeReport(Type type, NullabilityInfo nullabilityInfo, bool nullabilityEnabled)
     {
         Type = type;
-        NullabilityReport = new NullabilityReport(type, nullabilityInfo);
+        NullabilityReport = new NullabilityReport(type, nullabilityInfo, nullabilityEnabled);
         EnumerableReport = new EnumerableReport(type);
 
-        GenericTypeArgs = GetTypeReportsForGenericArguments(type, nullabilityInfo).ToList();
+        GenericTypeArgs = GetTypeReportsForGenericArguments(type, nullabilityInfo, nullabilityEnabled).ToList();
     }
 
     private IEnumerable<TypeReport> GetTypeReportsForGenericArguments(Type type,
-        NullabilityInfo nullabilityInfo)
+        NullabilityInfo nullabilityInfo, bool nullabilityEnabled)
     {
         if (!type.IsGenericType || NullabilityReport.HasNullableGenericType)
             yield break;
@@ -24,7 +24,7 @@ public class TypeReport
 
         for (var i = 0; i < genArgs.Length; i++)
         {
-            yield return new TypeReport(genArgs[i], nullabilityInfo.GenericTypeArguments[i]);
+            yield return new TypeReport(genArgs[i], nullabilityInfo.GenericTypeArguments[i], nullabilityEnabled);
         }
     }
 
@@ -66,8 +66,7 @@ public class TypeReport
             }
         }
 
-        if (NullabilityReport.IsNullable)
-            builder.Append('?');
+        builder.Append(NullabilityReport.GetNullabilityPostfix());
 
         return builder.ToString();
     }

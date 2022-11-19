@@ -8,11 +8,8 @@ namespace TestCodeGenerator.Generator.Modules.TestBuilder;
 
 public class PublicPropertyModule : TestBuilderModuleBase
 {
-    private readonly BuilderConfiguration _config;
-
-    public PublicPropertyModule(BuilderConfiguration config)
+    public PublicPropertyModule(BuilderConfiguration config) : base(config)
     {
-        _config = config;
     }
 
     public override void Apply(Type type, string builderClassName, Class cls, Namespaces namespaces)
@@ -39,7 +36,7 @@ public class PublicPropertyModule : TestBuilderModuleBase
     protected override Statement GetWithStatement(string originalName)
     {
         return new(
-            $"{_config.PropertyInjectionMethodName}(p => p.{originalName}, {originalName.LowercaseFirstLetter()});");
+            $"{Config.PropertyInjectionMethodName}(p => p.{originalName}, {originalName.LowercaseFirstLetter()});");
     }
 
     protected override string GetParameterName(string originalName)

@@ -1,5 +1,6 @@
 ﻿using RefleCS.Nodes;
 using System.Reflection;
+using TestCodeGenerator.Generator.Configurations;
 using TestCodeGenerator.Generator.Extensions;
 using TestCodeGenerator.Generator.Models;
 
@@ -7,6 +8,13 @@ namespace TestCodeGenerator.Generator.Modules.TestBuilder;
 
 public abstract class TestBuilderModuleBase : ITestBuilderModule
 {
+    protected readonly BuilderConfiguration Config;
+
+    protected TestBuilderModuleBase(BuilderConfiguration config)
+    {
+        Config = config;
+    }
+
     public abstract void Apply(Type type, string builderClassName, Class cls, Namespaces namespaces);
 
     protected abstract Statement GetWithStatement(string originalName);
@@ -16,7 +24,7 @@ public abstract class TestBuilderModuleBase : ITestBuilderModule
     protected void AddMethods(NullabilityInfo nullabilityInfo, Type type, string name, string builderClassName,
         Class cls, Namespaces namespaces)
     {
-        var typeReport = new TypeReport(type, nullabilityInfo);
+        var typeReport = new TypeReport(type, nullabilityInfo, Config.NullabilityEnabled);
 
         if (DoesMethodAlreadyExist(cls, $"With{name.CapitalizeFirstLetter()}", typeReport.GetFullName()))
             return;

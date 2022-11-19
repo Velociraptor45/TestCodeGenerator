@@ -11,4 +11,5 @@ public class BuilderConfiguration
     public string PropertyInjectionMethodName { get; init; } = string.Empty;
     public string OutputAssemblyRootNamespace { get; init; } = string.Empty;
     public string? BuilderNamePattern { get; init; } = null;
+    public bool NullabilityEnabled { get; init; } = true;
 }
