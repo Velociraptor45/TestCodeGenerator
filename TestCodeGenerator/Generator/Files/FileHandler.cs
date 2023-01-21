@@ -6,7 +6,7 @@ public class FileHandler : IFileHandler
 {
     public Assembly LoadAssembly(string dllPath)
     {
-        return Assembly.LoadFrom(dllPath);
+        return Assembly.LoadFile(dllPath);
     }
 
     public bool FileExits(string filePath)
