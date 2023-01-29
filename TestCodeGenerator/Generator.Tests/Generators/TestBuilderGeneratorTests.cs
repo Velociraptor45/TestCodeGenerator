@@ -251,7 +251,7 @@ public class TestBuilderGeneratorTests
             var sut = _fixture.CreateSut();
 
             // Act
-            sut.Generate(className);
+            sut.Generate(new List<string> { className });
 
             // Assert
             File.Exists(filePath).Should().BeTrue();
@@ -277,7 +277,7 @@ public class TestBuilderGeneratorTests
             var sut = _fixture.CreateSut();
 
             // Act
-            sut.Generate(className);
+            sut.Generate(new List<string> { className });
 
             // Assert
             File.Exists(filePath).Should().BeTrue();
@@ -298,7 +298,7 @@ public class TestBuilderGeneratorTests
             var sut = _fixture.CreateSut();
 
             // Act
-            var func = () => sut.Generate(nameof(WithClassNamePatternTest));
+            var func = () => sut.Generate(new List<string> { nameof(WithClassNamePatternTest) });
 
             // Assert
             func.Should().ThrowExactly<InvalidOperationException>()
@@ -324,7 +324,7 @@ public class TestBuilderGeneratorTests
             var sut = _fixture.CreateSut();
 
             // Act
-            sut.Generate(className);
+            sut.Generate(new List<string> { className });
 
             // Assert
             File.Exists(filePath).Should().BeTrue();
@@ -349,7 +349,7 @@ public class TestBuilderGeneratorTests
             var sut = _fixture.CreateSut();
 
             // Act
-            sut.Generate(className);
+            sut.Generate(new List<string> { className });
 
             // Assert
             File.Exists(filePath).Should().BeTrue();

@@ -16,7 +16,6 @@ public class TestBuilderGenerator
     private readonly ICsFileHandler _csFileHandler;
     private readonly BuilderConfiguration _config;
     private readonly List<ITestBuilderModule> _modules;
-    private readonly Namespaces _usings = new();
 
     public TestBuilderGenerator(IFileHandler fileHandler, ICsFileHandler csFileHandler, BuilderConfiguration config,
         IEnumerable<ITestBuilderModule> modules)
@@ -27,34 +26,48 @@ public class TestBuilderGenerator
         _modules = modules.ToList();
     }
 
-    public void Generate(string typeName)
+    public void Generate(IEnumerable<string> typeNames)
     {
-        _usings.Add(_config.GenericSuperclassNamespace);
-
         var assembly = _fileHandler.LoadAssembly(_config.DllPath);
 
-        var types = assembly.GetTypes().Where(t => t.Name == typeName).ToList();
+        var typeNamesList = typeNames.ToList();
+        foreach (var typeName in typeNamesList)
+        {
+            Console.WriteLine();
 
-        if (types.Count == 0)
-            throw new ArgumentException($"No class with type name '{typeName}' found", nameof(typeName));
-        if (types.Count > 1)
-            throw new ArgumentException($"More than one class with type name '{typeName}' found. Further distinction is currently not implemented", nameof(typeName));
+            var types = assembly.GetTypes().Where(t => t.Name == typeName).ToList();
 
-        var type = types.Single();
-        _usings.Add(type.Namespace!);
+            if (types.Count == 0)
+            {
+                Console.WriteLine($"No class with type name '{typeName}' found. Skipping {typeName}");
+                continue;
+            }
 
-        var builderClassName = GenerateBuilderClassName(type);
-        var builderFilePath = Path.Combine(_config.OutputFolder, $"{builderClassName}.cs");
+            if (types.Count > 1)
+            {
+                Console.WriteLine($"More than one class with type name '{typeName}' found. Further distinction is currently not implemented. Skipping {typeName}");
+                continue;
+            }
 
-        var file = _fileHandler.FileExits(builderFilePath)
-            ? _csFileHandler.FromFile(builderFilePath)
-            : new CsFile(Enumerable.Empty<Using>(), new Namespace(GetBuilderClassNamespace(type)));
+            Console.WriteLine($"Starting code generation for {typeName}");
+            var type = types.Single();
 
-        UpdateFile(file, type, builderClassName);
-        _csFileHandler.SaveOrReplace(file, builderFilePath);
+            var usings = new Namespaces { _config.GenericSuperclassNamespace, type.Namespace! };
+
+            var builderClassName = GenerateBuilderClassName(type);
+            var builderFilePath = Path.Combine(_config.OutputFolder, $"{builderClassName}.cs");
+
+            var file = _fileHandler.FileExits(builderFilePath)
+                ? _csFileHandler.FromFile(builderFilePath)
+                : new CsFile(Enumerable.Empty<Using>(), new Namespace(GetBuilderClassNamespace(type)));
+
+            UpdateFile(file, type, usings, builderClassName);
+            _csFileHandler.SaveOrReplace(file, builderFilePath);
+            Console.WriteLine($"Code generation for {typeName} completed");
+        }
     }
 
-    private void UpdateFile(CsFile file, Type type, string builderClassName)
+    private void UpdateFile(CsFile file, Type type, Namespaces usings, string builderClassName)
     {
         var cls = file.Nmsp.Classes.FirstOrDefault(c => c.Name == builderClassName);
 
@@ -78,10 +91,10 @@ public class TestBuilderGenerator
 
         foreach (var module in _modules)
         {
-            module.Apply(type, builderClassName, cls, _usings);
+            module.Apply(type, builderClassName, cls, usings);
         }
 
-        foreach (var @using in _usings)
+        foreach (var @using in usings)
         {
             file.AddUsing(new Using(@using));
         }
