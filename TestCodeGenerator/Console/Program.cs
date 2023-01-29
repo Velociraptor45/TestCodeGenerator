@@ -30,6 +30,8 @@ Parser.Default.ParseArguments<CliOptions>(args)
             return;
         }
 
+        var classNames = o.ClassName.Split(',').Select(c => c.Trim());
+
         var config = configsMatchingName.First();
         new TestBuilderGenerator(new FileHandler(), new CsFileHandler(), config,
                 new List<ITestBuilderModule>
@@ -37,5 +39,5 @@ Parser.Default.ParseArguments<CliOptions>(args)
                     new CtorParameterModule(config),
                     new PublicPropertyModule(config)
                 })
-            .Generate(o.ClassName);
+            .Generate(classNames);
     });

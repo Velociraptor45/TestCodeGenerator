@@ -100,8 +100,8 @@ provide the following settings in your appsettings.json
 
 and call TestCodeGenerator with
 
-```
-Console.exe -c "Item" -s "Domain"
+```bash
+Console.exe -c Item -s Domain # hint: you can also pass multiple type names with: -c Item,Store,Shop
 ```
 
 it will generate this builder:
