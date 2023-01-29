@@ -33,14 +33,9 @@ public class PublicPropertyModule : TestBuilderModuleBase
         }
     }
 
-    protected override Statement GetWithStatement(string originalName)
+    protected override Statement GetWithStatement(string originalName, string withMethodParameterName)
     {
         return new(
             $"{Config.PropertyInjectionMethodName}(p => p.{originalName}, {originalName.LowercaseFirstLetter()});");
-    }
-
-    protected override string GetParameterName(string originalName)
-    {
-        return originalName.LowercaseFirstLetter();
     }
 }

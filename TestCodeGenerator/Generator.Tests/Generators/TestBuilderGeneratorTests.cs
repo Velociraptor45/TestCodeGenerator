@@ -9,6 +9,7 @@ using TestCodeGenerator.Generator.Tests.Generators.TestClasses.CtorParameterModu
 using TestCodeGenerator.Generator.Tests.Generators.TestClasses.CustomizedBuilderName;
 using TestCodeGenerator.Generator.Tests.Generators.TestClasses.ExistingFile;
 using TestCodeGenerator.Generator.Tests.Generators.TestClasses.PublicPropertyModule;
+using TestCodeGenerator.Generator.Tests.Generators.TestClasses.Records;
 using TestCodeGenerator.Generator.Tests.Generators.TestClasses.WithoutNullability;
 using TestCodeGenerator.TestTools;
 using TestCodeGenerator.TestTools.Exceptions;
@@ -220,6 +221,18 @@ public class TestBuilderGeneratorTests
         yield return new object[]
         {
             nameof(PrivateSetPropertyTest), PrivateSetPropertyTest.GetExpectedBuilder()
+        };
+        yield return new object[]
+        {
+            nameof(RecordOnlyParameterTest), RecordOnlyParameterTest.GetExpectedBuilder()
+        };
+        yield return new object[]
+        {
+            nameof(RecordWithAdditionalPropertyTest), RecordWithAdditionalPropertyTest.GetExpectedBuilder()
+        };
+        yield return new object[]
+        {
+            nameof(RecordWithAdditionalCtorTest), RecordWithAdditionalCtorTest.GetExpectedBuilder()
         };
     }
 

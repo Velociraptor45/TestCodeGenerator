@@ -17,9 +17,12 @@ public abstract class TestBuilderModuleBase : ITestBuilderModule
 
     public abstract void Apply(Type type, string builderClassName, Class cls, Namespaces namespaces);
 
-    protected abstract Statement GetWithStatement(string originalName);
+    protected abstract Statement GetWithStatement(string originalName, string withMethodParameterName);
 
-    protected abstract string GetParameterName(string originalName);
+    protected string GetParameterName(string originalName)
+    {
+        return originalName.LowercaseFirstLetter();
+    }
 
     protected void AddMethods(NullabilityInfo nullabilityInfo, Type type, string name, string builderClassName,
         Class cls, Namespaces namespaces)
@@ -37,15 +40,16 @@ public abstract class TestBuilderModuleBase : ITestBuilderModule
     private void AddMethods(string name, TypeReport typeReport, string builderClassName, Class cls)
     {
         var capitalizedName = name.CapitalizeFirstLetter();
+        var withMethodParameterName = GetParameterName(name);
 
         // With
         var withMethod = Method.Public(
             builderClassName,
             $"With{capitalizedName}",
-            new List<Parameter> { new(typeReport.GetFullName(), GetParameterName(name)) },
+            new List<Parameter> { new(typeReport.GetFullName(), withMethodParameterName) },
             new List<Statement>
             {
-                GetWithStatement(name),
+                GetWithStatement(name, withMethodParameterName),
                 new("return this;")
             });
         cls.AddMethod(withMethod);
