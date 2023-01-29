@@ -32,13 +32,12 @@ public class CtorParameterModule : TestBuilderModuleBase
         }
     }
 
-    protected override Statement GetWithStatement(string originalName)
+    protected override Statement GetWithStatement(string originalName, string withMethodParameterName)
     {
-        return new($"{Config.CtorInjectionMethodName}(nameof({originalName}), {originalName});");
-    }
+        var nameParameter = originalName == withMethodParameterName
+            ? $"nameof({originalName})"
+            : $"\"{originalName}\"";
 
-    protected override string GetParameterName(string originalName)
-    {
-        return originalName;
+        return new($"{Config.CtorInjectionMethodName}({nameParameter}, {withMethodParameterName});");
     }
 }
