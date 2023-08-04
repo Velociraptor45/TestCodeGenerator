@@ -1,4 +1,5 @@
 ﻿using FluentAssertions;
+using MyNamespace.Folder;
 using RefleCS;
 using System.Reflection;
 using TestCodeGenerator.Generator.Configurations;
@@ -11,6 +12,9 @@ using TestCodeGenerator.Generator.Tests.Generators.TestClasses.ExistingFile;
 using TestCodeGenerator.Generator.Tests.Generators.TestClasses.PublicPropertyModule;
 using TestCodeGenerator.Generator.Tests.Generators.TestClasses.Records;
 using TestCodeGenerator.Generator.Tests.Generators.TestClasses.WithoutNullability;
+using TestCodeGenerator.Generator.Tests.Tests;
+using TestCodeGenerator.MyNamespace.Folder;
+using TestCodeGenerator.MyNamespace.Folder.Sub.Sub.Inside.Another.Folder.Here;
 using TestCodeGenerator.TestTools;
 using TestCodeGenerator.TestTools.Exceptions;
 
@@ -222,6 +226,8 @@ public class TestBuilderGeneratorTests
         {
             nameof(PrivateSetPropertyTest), PrivateSetPropertyTest.GetExpectedBuilder()
         };
+
+        // record
         yield return new object[]
         {
             nameof(RecordOnlyParameterTest), RecordOnlyParameterTest.GetExpectedBuilder()
@@ -233,6 +239,28 @@ public class TestBuilderGeneratorTests
         yield return new object[]
         {
             nameof(RecordWithAdditionalCtorTest), RecordWithAdditionalCtorTest.GetExpectedBuilder()
+        };
+
+        // namespaces
+        yield return new object[]
+        {
+            nameof(DifferentNamespaceTest), DifferentNamespaceTest.GetExpectedBuilder()
+        };
+        yield return new object[]
+        {
+            nameof(PartiallyDifferentNamespaceTest), PartiallyDifferentNamespaceTest.GetExpectedBuilder()
+        };
+        yield return new object[]
+        {
+            nameof(NamespaceLongerThanConfigTest), NamespaceLongerThanConfigTest.GetExpectedBuilder()
+        };
+        yield return new object[]
+        {
+            nameof(NamespaceSubsetOfConfigTest), NamespaceSubsetOfConfigTest.GetExpectedBuilder()
+        };
+        yield return new object[]
+        {
+            nameof(NamespaceSameAsConfigTest), NamespaceSameAsConfigTest.GetExpectedBuilder()
         };
     }
 
