@@ -13,7 +13,6 @@ The generated builders will not build the object itself but rather provide the "
 - Detect differences to an exising file and keep defined methods (see [here](#prevent-overwriting-methods))
 
 ## Limitations
-- Nullability is currently only handled for parameter types that are explicitely labeled as nullable with a `?`
 - No `WithEmpty` support for interfaces that inherit from `IEnumerable<T>` as parameter types e.g. `IList<T>`
 
 ## Cli Arguments
