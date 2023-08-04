@@ -104,15 +104,18 @@ public class TestBuilderGenerator
 
     private string GetBuilderClassNamespace(Type type)
     {
-        var rootNamespace = _config.OutputAssemblyRootNamespace;
-        var typeNamespace = type.Namespace!;
+        var rootNamespaceParts = _config.OutputAssemblyRootNamespace.Split('.');
+        var typeNamespaceParts = type.Namespace!.Split('.');
 
         for (int i = 0; i < _config.OutputAssemblyRootNamespace.Length; i++)
         {
-            if (rootNamespace[i] == typeNamespace[i])
+            if (typeNamespaceParts.Length <= i)
+                return _config.OutputAssemblyRootNamespace;
+
+            if (rootNamespaceParts[i] == typeNamespaceParts[i])
                 continue;
 
-            return $"{rootNamespace}.{typeNamespace[i..]}";
+            return $"{string.Join('.', rootNamespaceParts)}.{string.Join('.', typeNamespaceParts[i..])}";
         }
 
         throw new InvalidOperationException("Namespace detection failed. Debug me");
