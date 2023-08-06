@@ -12,4 +12,5 @@ public class BuilderConfiguration
     public string OutputAssemblyRootNamespace { get; init; } = string.Empty;
     public string? BuilderNamePattern { get; init; } = null;
     public bool NullabilityEnabled { get; init; } = true;
+    public bool MatchFolderToNamespace { get; set; } = false;
 }

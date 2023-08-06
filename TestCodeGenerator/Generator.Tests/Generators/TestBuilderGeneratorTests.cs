@@ -387,6 +387,32 @@ public class TestBuilderGeneratorTests
         });
     }
 
+    [Fact]
+    public void Generate_WithMatchFolderToNamespaceActive_ShouldPlaceFileInCorrectFolder()
+    {
+        TestFolder.CreateTemp(folderPath =>
+        {
+            // Arrange
+            var className = nameof(IntParameterTest);
+            var expectedBuilder = IntParameterTest.GetExpectedBuilder();
+            var filePath = Path.Combine(folderPath, "Generators", "TestClasses", "CtorParameterModule", $"{className}Builder.cs");
+
+            _fixture.SetupFileNotExisting(filePath);
+            _fixture.SetupBuilderConfiguration(folderPath, matchFolderToNamespace: true);
+            _fixture.SetupFileHandlerLoadingAssembly();
+            var sut = _fixture.CreateSut();
+
+            // Act
+            sut.Generate(new List<string> { className });
+
+            // Assert
+            File.Exists(filePath).Should().BeTrue();
+
+            var fileContent = File.ReadAllText(filePath);
+            fileContent.Should().Be(expectedBuilder);
+        });
+    }
+
     private class TestBuilderGeneratorFixture
     {
         private readonly Mock<IFileHandler> _fileHandlerMock = new(MockBehavior.Strict);
@@ -411,7 +437,7 @@ public class TestBuilderGeneratorTests
         }
 
         public void SetupBuilderConfiguration(string outputFolder, string? builderNamePattern = null,
-            bool nullabilityEnabled = true)
+            bool nullabilityEnabled = true, bool matchFolderToNamespace = false)
         {
             _builderConfiguration = new BuilderConfiguration
             {
@@ -423,7 +449,8 @@ public class TestBuilderGeneratorTests
                 PropertyInjectionMethodName = "FillPropertyWith",
                 OutputAssemblyRootNamespace = "TestCodeGenerator.Generator.Tests.Tests",
                 BuilderNamePattern = builderNamePattern,
-                NullabilityEnabled = nullabilityEnabled
+                NullabilityEnabled = nullabilityEnabled,
+                MatchFolderToNamespace = matchFolderToNamespace
             };
         }
 

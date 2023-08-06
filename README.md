@@ -24,35 +24,27 @@ The name of settings group in your appsettings file that you want to use
 ## appsetting configuration
 You have to provide a set of settings in order to let the TestCodeGenerator know about classes, namespaces and methods. A dummy examply can be found under `TestCodeGenerator/Console/appsettings.json`
 
-### Name
-The name of the settings group that is used for the `-s` CLI command
+`Name`: The name of the settings group that is used for the `-s` CLI command
 
-### DllPath
-The absolute path to the dll where your class is located
+`DllPath`: The absolute path to the dll where your class is located
 
-### OutputFolder
-The folder where the builder class file will be created
+`OutputFolder`: The folder where the builder class file will be created
 
-### GenericSuperclassTypeName
-The name of the superclass that the newly created builder class should inherit from
+`GenericSuperclassTypeName`: The name of the superclass that the newly created builder class should inherit from
 
-### GenericSuperclassNamespace
-The namespace of the class specified in `GenericSuperclassTypeName`
+`GenericSuperclassNamespace`: The namespace of the class specified in `GenericSuperclassTypeName`
 
-### CtorInjectionMethodName
-The method in the superclass that is used for ctor injections
+`CtorInjectionMethodName`: The method in the superclass that is used for ctor injections
 
-### PropertyInjectionMethodName
-The method in the superclass that is used for property injections
+`PropertyInjectionMethodName`: The method in the superclass that is used for property injections
 
-### OutputAssemblyRootNamespace
-The root namespace of the assembly where the newly created builder class should be placed in
+`OutputAssemblyRootNamespace`: The root namespace of the assembly where the newly created builder class should be placed in
 
-### BuilderNamePattern (optional)
-The pattern with which the builder class name is generated. Use `{ClassName}` as the placeholder for the class's name for which you are generating the builder. Omit it for the default pattern `{ClassName}Builder`
+(optional) `BuilderNamePattern`: The pattern with which the builder class name is generated. Use `{ClassName}` as the placeholder for the class's name for which you are generating the builder. Omit it for the default pattern `{ClassName}Builder`
 
-### NullabilityEnabled (optional)
-The indication whether the given class should be treated with enabled or disabled [nullability feature](https://learn.microsoft.com/en-us/dotnet/csharp/nullable-references). Default: `true`
+(optional) `NullabilityEnabled`: The indication whether the given class should be treated with enabled or disabled [nullability feature](https://learn.microsoft.com/en-us/dotnet/csharp/nullable-references). Default: `true`
+
+(optional) `MatchFolderToNamespace`: Place the output file in the folder path that corresponds to the builder class's namespaces, with the `OutputFolder` acting as the root. Default: `false`
 
 ## Example
 Let's say you have the following model,

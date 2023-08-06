@@ -55,11 +55,15 @@ public class TestBuilderGenerator
             var usings = new Namespaces { _config.GenericSuperclassNamespace, type.Namespace! };
 
             var builderClassName = GenerateBuilderClassName(type);
-            var builderFilePath = Path.Combine(_config.OutputFolder, $"{builderClassName}.cs");
+
+            var namespaceInfo = new NamespaceInfo(type, _config.OutputAssemblyRootNamespace);
+            var builderFilePath = _config.MatchFolderToNamespace
+                ? Path.Combine(_config.OutputFolder, namespaceInfo.InAssemblyPath.Replace('.', Path.DirectorySeparatorChar), $"{builderClassName}.cs")
+                : Path.Combine(_config.OutputFolder, $"{builderClassName}.cs");
 
             var file = _fileHandler.FileExits(builderFilePath)
                 ? _csFileHandler.FromFile(builderFilePath)
-                : new CsFile(Enumerable.Empty<Using>(), new Namespace(GetBuilderClassNamespace(type)));
+                : new CsFile(Enumerable.Empty<Using>(), new Namespace(namespaceInfo.BuilderClassNamespace));
 
             UpdateFile(file, type, usings, builderClassName);
             _csFileHandler.SaveOrReplace(file, builderFilePath);
@@ -100,25 +104,6 @@ public class TestBuilderGenerator
         }
 
         file.OrderUsingsAsc();
-    }
-
-    private string GetBuilderClassNamespace(Type type)
-    {
-        var rootNamespaceParts = _config.OutputAssemblyRootNamespace.Split('.');
-        var typeNamespaceParts = type.Namespace!.Split('.');
-
-        for (int i = 0; i < _config.OutputAssemblyRootNamespace.Length; i++)
-        {
-            if (typeNamespaceParts.Length <= i)
-                return _config.OutputAssemblyRootNamespace;
-
-            if (rootNamespaceParts[i] == typeNamespaceParts[i])
-                continue;
-
-            return $"{string.Join('.', rootNamespaceParts)}.{string.Join('.', typeNamespaceParts[i..])}";
-        }
-
-        throw new InvalidOperationException("Namespace detection failed. Debug me");
     }
 
     private string GenerateBuilderClassName(Type type)
