@@ -63,6 +63,7 @@ public class TestBuilderGenerator
 
             var file = _fileHandler.FileExits(builderFilePath)
                 ? _csFileHandler.FromFile(builderFilePath)
+                    ?? new CsFile(Enumerable.Empty<Using>(), new Namespace(namespaceInfo.BuilderClassNamespace))
                 : new CsFile(Enumerable.Empty<Using>(), new Namespace(namespaceInfo.BuilderClassNamespace));
 
             UpdateFile(file, type, usings, builderClassName);

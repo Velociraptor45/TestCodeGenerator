@@ -22,12 +22,7 @@ namespace TestCodeGenerator.Generator.Tests.Generators;
 
 public class TestBuilderGeneratorTests
 {
-    private readonly TestBuilderGeneratorFixture _fixture;
-
-    public TestBuilderGeneratorTests()
-    {
-        _fixture = new TestBuilderGeneratorFixture();
-    }
+    private readonly TestBuilderGeneratorFixture _fixture = new();
 
     public static IEnumerable<object?[]> GenerateWithExistingFileTestData()
     {
@@ -413,16 +408,38 @@ public class TestBuilderGeneratorTests
         });
     }
 
+    [Fact]
+    public void Generate_WithFileWithInvalidCsAlreadyExisting_ShouldSaveExpectedResult()
+    {
+        var className = nameof(IntParameterTest);
+        var expectedBuilder = IntParameterTest.GetExpectedBuilder();
+        TestFolder.CreateTemp(folderPath =>
+        {
+            // Arrange
+            var filePath = Path.Combine(folderPath, $"{className}Builder.cs");
+            File.WriteAllText(filePath, "This is no valid C#");
+
+            _fixture.SetupFileExisting(filePath);
+            _fixture.SetupBuilderConfiguration(folderPath);
+            _fixture.SetupFileHandlerLoadingAssembly();
+            var sut = _fixture.CreateSut();
+
+            // Act
+            sut.Generate(new List<string> { className });
+
+            // Assert
+            File.Exists(filePath).Should().BeTrue();
+
+            var fileContent = File.ReadAllText(filePath);
+            fileContent.Should().Be(expectedBuilder);
+        });
+    }
+
     private class TestBuilderGeneratorFixture
     {
         private readonly Mock<IFileHandler> _fileHandlerMock = new(MockBehavior.Strict);
         private BuilderConfiguration? _builderConfiguration;
-        private readonly Assembly _assembly;
-
-        public TestBuilderGeneratorFixture()
-        {
-            _assembly = Assembly.GetExecutingAssembly();
-        }
+        private readonly Assembly _assembly = Assembly.GetExecutingAssembly();
 
         public TestBuilderGenerator CreateSut()
         {
