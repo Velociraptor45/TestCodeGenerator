@@ -13,18 +13,20 @@ public class InheritFromIEnumerableWithoutStandardCtorParameterTest
 
     public static string GetExpectedBuilder()
     {
-        return @"using Superclass.Namespace;
-using TestCodeGenerator.Generator.Tests.Generators.Subclasses;
-using TestCodeGenerator.Generator.Tests.Generators.TestClasses.CtorParameterModule;
+        return """
+               using Superclass.Namespace;
+               using TestCodeGenerator.Generator.Tests.Generators.Subclasses;
+               using TestCodeGenerator.Generator.Tests.Generators.TestClasses.CtorParameterModule;
 
-namespace TestCodeGenerator.Generator.Tests.Tests.Generators.TestClasses.CtorParameterModule;
-public class InheritFromIEnumerableWithoutStandardCtorParameterTestBuilder : DomainTestBuilderBase<InheritFromIEnumerableWithoutStandardCtorParameterTest>
-{
-    public InheritFromIEnumerableWithoutStandardCtorParameterTestBuilder WithIds(InheritFromIEnumerableWithoutStandardCtor ids)
-    {
-        FillConstructorWith(nameof(ids), ids);
-        return this;
-    }
-}";
+               namespace TestCodeGenerator.Generator.Tests.Tests.Generators.TestClasses.CtorParameterModule;
+               public class InheritFromIEnumerableWithoutStandardCtorParameterTestBuilder : DomainTestBuilderBase<InheritFromIEnumerableWithoutStandardCtorParameterTest>
+               {
+                   public InheritFromIEnumerableWithoutStandardCtorParameterTestBuilder WithIds(InheritFromIEnumerableWithoutStandardCtor ids)
+                   {
+                       FillConstructorWith(nameof(ids), ids);
+                       return this;
+                   }
+               }
+               """;
     }
 }

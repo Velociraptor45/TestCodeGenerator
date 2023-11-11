@@ -12,7 +12,7 @@ public class PublicPropertyModule : TestBuilderModuleBase
     {
     }
 
-    public override void Apply(Type type, string builderClassName, Class cls, Namespaces namespaces)
+    public override void Apply(Type type, string builderClassName, Class cls, Usings usings)
     {
         var properties = new Dictionary<(string, string), PropertyInfo>();
 
@@ -29,7 +29,7 @@ public class PublicPropertyModule : TestBuilderModuleBase
         foreach (var info in properties.Values)
         {
             var nullabilityInfo = new NullabilityInfoContext().Create(info);
-            AddMethods(nullabilityInfo, info.PropertyType, info.Name, builderClassName, cls, namespaces);
+            AddMethods(nullabilityInfo, info.PropertyType, info.Name, builderClassName, cls, usings);
         }
     }
 

@@ -11,24 +11,26 @@ public class EnumerableInListParameterTest
 
     public static string GetExpectedBuilder()
     {
-        return @"using Superclass.Namespace;
-using System;
-using System.Collections.Generic;
-using TestCodeGenerator.Generator.Tests.Generators.TestClasses.CtorParameterModule;
+        return """
+               using Superclass.Namespace;
+               using System;
+               using System.Collections.Generic;
+               using TestCodeGenerator.Generator.Tests.Generators.TestClasses.CtorParameterModule;
 
-namespace TestCodeGenerator.Generator.Tests.Tests.Generators.TestClasses.CtorParameterModule;
-public class EnumerableInListParameterTestBuilder : DomainTestBuilderBase<EnumerableInListParameterTest>
-{
-    public EnumerableInListParameterTestBuilder WithIds(List<IEnumerable<int>> ids)
-    {
-        FillConstructorWith(nameof(ids), ids);
-        return this;
-    }
+               namespace TestCodeGenerator.Generator.Tests.Tests.Generators.TestClasses.CtorParameterModule;
+               public class EnumerableInListParameterTestBuilder : DomainTestBuilderBase<EnumerableInListParameterTest>
+               {
+                   public EnumerableInListParameterTestBuilder WithIds(List<IEnumerable<int>> ids)
+                   {
+                       FillConstructorWith(nameof(ids), ids);
+                       return this;
+                   }
 
-    public EnumerableInListParameterTestBuilder WithEmptyIds()
-    {
-        return WithIds(new List<IEnumerable<int>>());
-    }
-}";
+                   public EnumerableInListParameterTestBuilder WithEmptyIds()
+                   {
+                       return WithIds(new List<IEnumerable<int>>());
+                   }
+               }
+               """;
     }
 }

@@ -6,12 +6,14 @@ public class GetOnlyPropertyTest
 
     public static string GetExpectedBuilder()
     {
-        return @"using Superclass.Namespace;
-using TestCodeGenerator.Generator.Tests.Generators.TestClasses.PublicPropertyModule;
+        return """
+               using Superclass.Namespace;
+               using TestCodeGenerator.Generator.Tests.Generators.TestClasses.PublicPropertyModule;
 
-namespace TestCodeGenerator.Generator.Tests.Tests.Generators.TestClasses.PublicPropertyModule;
-public class GetOnlyPropertyTestBuilder : DomainTestBuilderBase<GetOnlyPropertyTest>
-{
-}";
+               namespace TestCodeGenerator.Generator.Tests.Tests.Generators.TestClasses.PublicPropertyModule;
+               public class GetOnlyPropertyTestBuilder : DomainTestBuilderBase<GetOnlyPropertyTest>
+               {
+               }
+               """;
     }
 }

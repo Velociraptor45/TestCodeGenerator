@@ -4,13 +4,15 @@ public class WithoutClassNamePatternTest
 {
     public static string GetExpectedBuilder()
     {
-        return @"using Superclass.Namespace;
-using TestCodeGenerator.Generator.Tests.Generators.TestClasses.CustomizedBuilderName;
+        return """
+               using Superclass.Namespace;
+               using TestCodeGenerator.Generator.Tests.Generators.TestClasses.CustomizedBuilderName;
 
-namespace TestCodeGenerator.Generator.Tests.Tests.Generators.TestClasses.CustomizedBuilderName;
-public class WithoutClassNamePatternTestBuilder : DomainTestBuilderBase<WithoutClassNamePatternTest>
-{
-}";
+               namespace TestCodeGenerator.Generator.Tests.Tests.Generators.TestClasses.CustomizedBuilderName;
+               public class WithoutClassNamePatternTestBuilder : DomainTestBuilderBase<WithoutClassNamePatternTest>
+               {
+               }
+               """;
     }
 
     public static string? GetBuilderNamePattern()

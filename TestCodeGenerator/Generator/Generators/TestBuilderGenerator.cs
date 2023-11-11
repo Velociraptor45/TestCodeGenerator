@@ -52,7 +52,7 @@ public class TestBuilderGenerator
             Console.WriteLine($"Starting code generation for {typeName}");
             var type = types.Single();
 
-            var usings = new Namespaces { _config.GenericSuperclassNamespace, type.Namespace! };
+            var usings = new Usings { _config.GenericSuperclassNamespace, type.Namespace! };
 
             var builderClassName = GenerateBuilderClassName(type);
 
@@ -72,7 +72,7 @@ public class TestBuilderGenerator
         }
     }
 
-    private void UpdateFile(CsFile file, Type type, Namespaces usings, string builderClassName)
+    private void UpdateFile(CsFile file, Type type, Usings usings, string builderClassName)
     {
         var cls = file.Nmsp.Classes.FirstOrDefault(c => c.Name == builderClassName);
 
@@ -101,7 +101,7 @@ public class TestBuilderGenerator
 
         foreach (var @using in usings)
         {
-            file.AddUsing(new Using(@using));
+            file.AddUsing(@using);
         }
 
         file.OrderUsingsAsc();

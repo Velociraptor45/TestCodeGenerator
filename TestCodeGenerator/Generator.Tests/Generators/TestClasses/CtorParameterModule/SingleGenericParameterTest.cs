@@ -13,19 +13,21 @@ public class SingleGenericParameterTest
 
     public static string GetExpectedBuilder()
     {
-        return @"using Superclass.Namespace;
-using System;
-using TestCodeGenerator.Generator.Tests.Generators.Subclasses;
-using TestCodeGenerator.Generator.Tests.Generators.TestClasses.CtorParameterModule;
+        return """
+               using Superclass.Namespace;
+               using System;
+               using TestCodeGenerator.Generator.Tests.Generators.Subclasses;
+               using TestCodeGenerator.Generator.Tests.Generators.TestClasses.CtorParameterModule;
 
-namespace TestCodeGenerator.Generator.Tests.Tests.Generators.TestClasses.CtorParameterModule;
-public class SingleGenericParameterTestBuilder : DomainTestBuilderBase<SingleGenericParameterTest>
-{
-    public SingleGenericParameterTestBuilder WithIds(SingleGeneric<char> ids)
-    {
-        FillConstructorWith(nameof(ids), ids);
-        return this;
-    }
-}";
+               namespace TestCodeGenerator.Generator.Tests.Tests.Generators.TestClasses.CtorParameterModule;
+               public class SingleGenericParameterTestBuilder : DomainTestBuilderBase<SingleGenericParameterTest>
+               {
+                   public SingleGenericParameterTestBuilder WithIds(SingleGeneric<char> ids)
+                   {
+                       FillConstructorWith(nameof(ids), ids);
+                       return this;
+                   }
+               }
+               """;
     }
 }

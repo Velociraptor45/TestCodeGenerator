@@ -15,7 +15,7 @@ public abstract class TestBuilderModuleBase : ITestBuilderModule
         Config = config;
     }
 
-    public abstract void Apply(Type type, string builderClassName, Class cls, Namespaces namespaces);
+    public abstract void Apply(Type type, string builderClassName, Class cls, Usings usings);
 
     protected abstract Statement GetWithStatement(string originalName, string withMethodParameterName);
 
@@ -25,19 +25,19 @@ public abstract class TestBuilderModuleBase : ITestBuilderModule
     }
 
     protected void AddMethods(NullabilityInfo nullabilityInfo, Type type, string name, string builderClassName,
-        Class cls, Namespaces namespaces)
+        Class cls, Usings usings)
     {
         var typeReport = new TypeReport(type, nullabilityInfo, Config.NullabilityEnabled);
 
         if (DoesMethodAlreadyExist(cls, $"With{name.CapitalizeFirstLetter()}", typeReport.GetFullName()))
             return;
 
-        namespaces.AddRange(typeReport.GetAllNamespaces());
+        usings.AddRange(typeReport.GetAllNamespaces());
 
-        AddMethods(name, typeReport, builderClassName, cls);
+        AddMethods(name, typeReport, builderClassName, cls, usings);
     }
 
-    private void AddMethods(string name, TypeReport typeReport, string builderClassName, Class cls)
+    private void AddMethods(string name, TypeReport typeReport, string builderClassName, Class cls, Usings usings)
     {
         var capitalizedName = name.CapitalizeFirstLetter();
         var withMethodParameterName = GetParameterName(name);
@@ -57,7 +57,7 @@ public abstract class TestBuilderModuleBase : ITestBuilderModule
         // WithEmpty
         if (typeReport.EnumerableReport.IsOrImplementsIEnumerable)
         {
-            AddWithEmptyMethod(capitalizedName, typeReport, builderClassName, cls);
+            AddWithEmptyMethod(capitalizedName, typeReport, builderClassName, cls, usings);
         }
 
         // Without
@@ -71,7 +71,8 @@ public abstract class TestBuilderModuleBase : ITestBuilderModule
         }
     }
 
-    private void AddWithEmptyMethod(string capitalizedName, TypeReport typeReport, string builderClassName, Class cls)
+    private static void AddWithEmptyMethod(string capitalizedName, TypeReport typeReport, string builderClassName, Class cls,
+        Usings usings)
     {
         if (!typeReport.HasStandardCtor && !typeReport.EnumerableReport.IsIEnumerable)
         {
@@ -80,7 +81,9 @@ public abstract class TestBuilderModuleBase : ITestBuilderModule
             return;
         }
 
-        var emptyEnumerableInitialization = GetInitializationOfEmptyEnumerable(typeReport);
+        var emptyEnumerableInitialization = GetInitializationOfEmptyEnumerable(typeReport, out var usng);
+        if (usng is not null)
+            usings.Add(usng);
 
         var withEmptyMethod = Method.Public(
             builderClassName,
@@ -89,11 +92,13 @@ public abstract class TestBuilderModuleBase : ITestBuilderModule
         cls.AddMethod(withEmptyMethod);
     }
 
-    private string GetInitializationOfEmptyEnumerable(TypeReport typeReport)
+    private static string GetInitializationOfEmptyEnumerable(TypeReport typeReport, out Using? usng)
     {
         if (!typeReport.EnumerableReport.IsOrImplementsIEnumerable)
             throw new InvalidOperationException(
                 "Cannot create statement for enumerable initialization when type doesn't implement IEnumerable");
+
+        usng = null;
 
         if (typeReport.IsGeneric)
         {
@@ -102,6 +107,7 @@ public abstract class TestBuilderModuleBase : ITestBuilderModule
                 return $"new {typeReport.Type.Name[..^2]}<{typeReport.GetGenericArgs()}>()";
             }
 
+            usng = new Using("System.Linq");
             return $"Enumerable.Empty<{typeReport.GenericTypeArgs.First().GetFullName()}>()";
         }
 
