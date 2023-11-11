@@ -6,29 +6,32 @@ public class NullableEnumerablePropertyTest
 
     public static string GetExpectedBuilder()
     {
-        return @"using Superclass.Namespace;
-using System;
-using System.Collections.Generic;
-using TestCodeGenerator.Generator.Tests.Generators.TestClasses.PublicPropertyModule;
+        return """
+               using Superclass.Namespace;
+               using System;
+               using System.Collections.Generic;
+               using System.Linq;
+               using TestCodeGenerator.Generator.Tests.Generators.TestClasses.PublicPropertyModule;
 
-namespace TestCodeGenerator.Generator.Tests.Tests.Generators.TestClasses.PublicPropertyModule;
-public class NullableEnumerablePropertyTestBuilder : DomainTestBuilderBase<NullableEnumerablePropertyTest>
-{
-    public NullableEnumerablePropertyTestBuilder WithIds(IEnumerable<int>? ids)
-    {
-        FillPropertyWith(p => p.Ids, ids);
-        return this;
-    }
+               namespace TestCodeGenerator.Generator.Tests.Tests.Generators.TestClasses.PublicPropertyModule;
+               public class NullableEnumerablePropertyTestBuilder : DomainTestBuilderBase<NullableEnumerablePropertyTest>
+               {
+                   public NullableEnumerablePropertyTestBuilder WithIds(IEnumerable<int>? ids)
+                   {
+                       FillPropertyWith(p => p.Ids, ids);
+                       return this;
+                   }
 
-    public NullableEnumerablePropertyTestBuilder WithEmptyIds()
-    {
-        return WithIds(Enumerable.Empty<int>());
-    }
+                   public NullableEnumerablePropertyTestBuilder WithEmptyIds()
+                   {
+                       return WithIds(Enumerable.Empty<int>());
+                   }
 
-    public NullableEnumerablePropertyTestBuilder WithoutIds()
-    {
-        return WithIds(null);
-    }
-}";
+                   public NullableEnumerablePropertyTestBuilder WithoutIds()
+                   {
+                       return WithIds(null);
+                   }
+               }
+               """;
     }
 }

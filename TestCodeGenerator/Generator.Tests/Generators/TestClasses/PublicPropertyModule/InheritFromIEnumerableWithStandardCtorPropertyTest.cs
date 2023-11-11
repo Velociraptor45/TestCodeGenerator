@@ -8,23 +8,25 @@ public class InheritFromIEnumerableWithStandardCtorPropertyTest
 
     public static string GetExpectedBuilder()
     {
-        return @"using Superclass.Namespace;
-using TestCodeGenerator.Generator.Tests.Generators.Subclasses;
-using TestCodeGenerator.Generator.Tests.Generators.TestClasses.PublicPropertyModule;
+        return """
+               using Superclass.Namespace;
+               using TestCodeGenerator.Generator.Tests.Generators.Subclasses;
+               using TestCodeGenerator.Generator.Tests.Generators.TestClasses.PublicPropertyModule;
 
-namespace TestCodeGenerator.Generator.Tests.Tests.Generators.TestClasses.PublicPropertyModule;
-public class InheritFromIEnumerableWithStandardCtorPropertyTestBuilder : DomainTestBuilderBase<InheritFromIEnumerableWithStandardCtorPropertyTest>
-{
-    public InheritFromIEnumerableWithStandardCtorPropertyTestBuilder WithIds(InheritFromIEnumerableWithStandardCtor ids)
-    {
-        FillPropertyWith(p => p.Ids, ids);
-        return this;
-    }
-
-    public InheritFromIEnumerableWithStandardCtorPropertyTestBuilder WithEmptyIds()
-    {
-        return WithIds(new InheritFromIEnumerableWithStandardCtor());
-    }
-}";
+               namespace TestCodeGenerator.Generator.Tests.Tests.Generators.TestClasses.PublicPropertyModule;
+               public class InheritFromIEnumerableWithStandardCtorPropertyTestBuilder : DomainTestBuilderBase<InheritFromIEnumerableWithStandardCtorPropertyTest>
+               {
+                   public InheritFromIEnumerableWithStandardCtorPropertyTestBuilder WithIds(InheritFromIEnumerableWithStandardCtor ids)
+                   {
+                       FillPropertyWith(p => p.Ids, ids);
+                       return this;
+                   }
+               
+                   public InheritFromIEnumerableWithStandardCtorPropertyTestBuilder WithEmptyIds()
+                   {
+                       return WithIds(new InheritFromIEnumerableWithStandardCtor());
+                   }
+               }
+               """;
     }
 }

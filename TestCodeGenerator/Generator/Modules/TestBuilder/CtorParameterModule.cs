@@ -11,7 +11,7 @@ public class CtorParameterModule : TestBuilderModuleBase
     {
     }
 
-    public override void Apply(Type type, string builderClassName, Class cls, Namespaces namespaces)
+    public override void Apply(Type type, string builderClassName, Class cls, Usings usings)
     {
         var parameters = new Dictionary<(string, string), ParameterInfo>();
 
@@ -28,7 +28,7 @@ public class CtorParameterModule : TestBuilderModuleBase
         foreach (var info in parameters.Values)
         {
             var nullabilityInfo = new NullabilityInfoContext().Create(info);
-            AddMethods(nullabilityInfo, info.ParameterType, info.Name!, builderClassName, cls, namespaces);
+            AddMethods(nullabilityInfo, info.ParameterType, info.Name!, builderClassName, cls, usings);
         }
     }
 

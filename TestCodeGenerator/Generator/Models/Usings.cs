@@ -1,15 +1,20 @@
-﻿using System.Collections;
+﻿using RefleCS.Nodes;
+using System.Collections;
 
 namespace TestCodeGenerator.Generator.Models;
 
-public class Namespaces : IEnumerable<string>
+public class Usings : IEnumerable<Using>
 {
-    private readonly HashSet<string> _namespaces = new();
+    private readonly HashSet<Using> _namespaces = new();
 
-    public void Add(string nmsp)
+    public void Add(string usng)
     {
-        if (!_namespaces.Contains(nmsp))
-            _namespaces.Add(nmsp);
+        Add(new Using(usng));
+    }
+
+    public void Add(Using usng)
+    {
+        _namespaces.Add(usng);
     }
 
     public void AddRange(IEnumerable<string> namespaces)
@@ -20,7 +25,7 @@ public class Namespaces : IEnumerable<string>
         }
     }
 
-    public IEnumerator<string> GetEnumerator()
+    public IEnumerator<Using> GetEnumerator()
     {
         return _namespaces.GetEnumerator();
     }

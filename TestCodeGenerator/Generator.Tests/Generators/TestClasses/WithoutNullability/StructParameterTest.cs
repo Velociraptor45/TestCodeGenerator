@@ -13,18 +13,20 @@ public class StructParameterTest
 
     public static string GetExpectedBuilder()
     {
-        return @"using Superclass.Namespace;
-using TestCodeGenerator.Generator.Tests.Generators.Subclasses;
-using TestCodeGenerator.Generator.Tests.Generators.TestClasses.WithoutNullability;
+        return """
+               using Superclass.Namespace;
+               using TestCodeGenerator.Generator.Tests.Generators.Subclasses;
+               using TestCodeGenerator.Generator.Tests.Generators.TestClasses.WithoutNullability;
 
-namespace TestCodeGenerator.Generator.Tests.Tests.Generators.TestClasses.WithoutNullability;
-public class StructParameterTestBuilder : DomainTestBuilderBase<StructParameterTest>
-{
-    public StructParameterTestBuilder WithId(StructDummy id)
-    {
-        FillConstructorWith(nameof(id), id);
-        return this;
-    }
-}";
+               namespace TestCodeGenerator.Generator.Tests.Tests.Generators.TestClasses.WithoutNullability;
+               public class StructParameterTestBuilder : DomainTestBuilderBase<StructParameterTest>
+               {
+                   public StructParameterTestBuilder WithId(StructDummy id)
+                   {
+                       FillConstructorWith(nameof(id), id);
+                       return this;
+                   }
+               }
+               """;
     }
 }
