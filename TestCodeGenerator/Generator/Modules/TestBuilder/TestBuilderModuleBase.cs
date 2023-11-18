@@ -55,7 +55,7 @@ public abstract class TestBuilderModuleBase : ITestBuilderModule
         cls.AddMethod(withMethod);
 
         // WithEmpty
-        if (typeReport.EnumerableReport.IsOrImplementsIEnumerable)
+        if (typeReport.EnumerableReport.IsOrImplementsIEnumerable || typeReport.EnumerableReport.SupportsEmptyInitialization)
         {
             AddWithEmptyMethod(capitalizedName, typeReport, builderClassName, cls, usings);
         }
@@ -74,7 +74,9 @@ public abstract class TestBuilderModuleBase : ITestBuilderModule
     private static void AddWithEmptyMethod(string capitalizedName, TypeReport typeReport, string builderClassName, Class cls,
         Usings usings)
     {
-        if (!typeReport.HasStandardCtor && !typeReport.EnumerableReport.IsIEnumerable)
+        if (!typeReport.HasStandardCtor
+            && !typeReport.EnumerableReport.SupportsEmptyInitialization
+            && !typeReport.EnumerableReport.IsIEnumerable)
         {
             Console.WriteLine(
                 $"No standard ctor found for type {typeReport.GetFullName()}. Skipping 'WithEmpty' method");
@@ -92,23 +94,22 @@ public abstract class TestBuilderModuleBase : ITestBuilderModule
         cls.AddMethod(withEmptyMethod);
     }
 
-    private static string GetInitializationOfEmptyEnumerable(TypeReport typeReport, out Using? usng)
+    private static string GetInitializationOfEmptyEnumerable(TypeReport typeReport, out Using? @using)
     {
-        if (!typeReport.EnumerableReport.IsOrImplementsIEnumerable)
+        if (!typeReport.EnumerableReport.IsOrImplementsIEnumerable && !typeReport.EnumerableReport.SupportsEmptyInitialization)
             throw new InvalidOperationException(
                 "Cannot create statement for enumerable initialization when type doesn't implement IEnumerable");
 
-        usng = null;
+        @using = null;
+
+        if (typeReport.EnumerableReport.SupportsEmptyInitialization)
+        {
+            return typeReport.EnumerableReport.GetEmptyInitialization(typeReport, out @using);
+        }
 
         if (typeReport.IsGeneric)
         {
-            if (!typeReport.EnumerableReport.IsIEnumerable)
-            {
-                return $"new {typeReport.Type.Name[..^2]}<{typeReport.GetGenericArgs()}>()";
-            }
-
-            usng = new Using("System.Linq");
-            return $"Enumerable.Empty<{typeReport.GenericTypeArgs.First().GetFullName()}>()";
+            return $"new {typeReport.Type.Name[..^2]}<{typeReport.GetGenericArgs()}>()";
         }
 
         return $"new {typeReport.Type.Name}()";

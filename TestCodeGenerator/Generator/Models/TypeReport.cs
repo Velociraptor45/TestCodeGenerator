@@ -89,10 +89,31 @@ public class TypeReport
         return Type.Namespace!;
     }
 
-    private static string ResolveTypeName(Type type)
+    public static string ResolveTypeName(Type type)
     {
-        _typeAlias.TryGetValue(type, out var argName);
-        return argName ?? type.Name;
+        if (type.IsArray)
+        {
+            var arrayDepth = 1;
+            var elementType = type.GetElementType()!;
+            while (elementType.IsArray)
+            {
+                elementType = elementType.GetElementType()!;
+                arrayDepth++;
+            }
+
+            var elementTypeName = GetTypeName(elementType);
+
+            var arrayBrackets = Enumerable.Repeat("[]", arrayDepth);
+            return $"{elementTypeName}{string.Join(string.Empty, arrayBrackets)}";
+        }
+
+        return GetTypeName(type);
+
+        string GetTypeName(Type basicType)
+        {
+            _typeAlias.TryGetValue(basicType, out var argName);
+            return argName ?? basicType.Name;
+        }
     }
 
     private static readonly Dictionary<Type, string> _typeAlias = new()

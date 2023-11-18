@@ -108,6 +108,12 @@ public class TestBuilderGeneratorTests
         yield return new object[] { nameof(ListParameterTest), ListParameterTest.GetExpectedBuilder() };
         yield return new object[] { nameof(DictionaryParameterTest), DictionaryParameterTest.GetExpectedBuilder() };
         yield return new object[] { nameof(EnumerableParameterTest), EnumerableParameterTest.GetExpectedBuilder() };
+        yield return new object[] { nameof(IListParameterTest), IListParameterTest.GetExpectedBuilder() };
+        yield return new object[] { nameof(IDictionaryParameterTest), IDictionaryParameterTest.GetExpectedBuilder() };
+        yield return new object[] { nameof(ICollectionParameterTest), ICollectionParameterTest.GetExpectedBuilder() };
+        yield return new object[] { nameof(IReadOnlyCollectionParameterTest), IReadOnlyCollectionParameterTest.GetExpectedBuilder() };
+        yield return new object[] { nameof(ArrayParameterTest), ArrayParameterTest.GetExpectedBuilder() };
+        yield return new object[] { nameof(ArrayInArrayParameterTest), ArrayInArrayParameterTest.GetExpectedBuilder() };
         yield return new object[]
         {
             nameof(InheritFromIEnumerableWithStandardCtorParameterTest),
