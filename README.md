@@ -22,7 +22,7 @@ The name of the class you want to create a builder for
 The name of settings group in your appsettings file that you want to use
 
 ## appsetting configuration
-You have to provide a set of settings in order to let the TestCodeGenerator know about classes, namespaces and methods. A dummy examply can be found under `TestCodeGenerator/Console/appsettings.json`
+You have to provide a set of settings in order to let the TestCodeGenerator know about classes, namespaces and methods. A dummy examply can be found under `src/TestCodeGenerator/appsettings.json`
 
 `Name`: The name of the settings group that is used for the `-s` CLI command
 
@@ -92,7 +92,7 @@ provide the following settings in your appsettings.json
 and call TestCodeGenerator with
 
 ```bash
-Console.exe -c Item -s Domain # hint: you can also pass multiple type names with: -c Item,Store,Shop
+TestCodeGenerator.exe -c Item -s Domain # hint: you can also pass multiple type names with: -c Item,Store,Shop
 ```
 
 it will generate this builder:
