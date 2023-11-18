@@ -1,7 +1,7 @@
 ﻿using CommandLine;
 using Microsoft.Extensions.Configuration;
 using RefleCS;
-using TestCodeGenerator.Console;
+using TestCodeGenerator;
 using TestCodeGenerator.Generator.Configurations;
 using TestCodeGenerator.Generator.Files;
 using TestCodeGenerator.Generator.Generators;

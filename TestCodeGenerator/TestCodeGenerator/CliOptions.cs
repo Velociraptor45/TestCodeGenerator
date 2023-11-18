@@ -1,6 +1,6 @@
 ﻿using CommandLine;
 
-namespace TestCodeGenerator.Console;
+namespace TestCodeGenerator;
 
 public class CliOptions
 {
