@@ -5,7 +5,7 @@
     <TargetFramework>net7.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <RootNamespace>TestCodeGenerator.Console</RootNamespace>
+    <RootNamespace>TestCodeGenerator</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
