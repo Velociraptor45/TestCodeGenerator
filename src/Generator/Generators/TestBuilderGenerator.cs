@@ -35,7 +35,9 @@ public class TestBuilderGenerator
         {
             Console.WriteLine();
 
-            var types = assembly.GetTypes().Where(t => t.Name == typeName).ToList();
+            var typeNameWithoutNamespace = typeName.Split('.')[^1];
+
+            var types = assembly.GetTypes().Where(t => t.Name == typeNameWithoutNamespace).ToList();
 
             if (types.Count == 0)
             {
@@ -45,8 +47,12 @@ public class TestBuilderGenerator
 
             if (types.Count > 1)
             {
-                Console.WriteLine($"More than one class with type name '{typeName}' found. Further distinction is currently not implemented. Skipping {typeName}");
-                continue;
+                types = types.Where(t => t.FullName!.EndsWith(typeName)).ToList();
+                if (types.Count > 1)
+                {
+                    Console.WriteLine($"More than one class with type name '{typeName}' found. Add the namespace to your class name for unambiguous detection. Skipping {typeName}");
+                    continue;
+                }
             }
 
             Console.WriteLine($"Starting code generation for {typeName}");

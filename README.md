@@ -17,7 +17,7 @@ The generated builders will not build the object itself but rather provide the "
 
 ## Cli Arguments
 - `-c | --class` <br/>
-The name of the class you want to create a builder for
+A comma separated list of names of classes you want to create a builder for. If you have multiple classes with the same name in the assembly, you can add the full or partial namespace to disambiguate them (`Two.MyClass` is enough to differentiate between `One.Two.MyClass` & `One.Three.MyClass`)
 - `-s | --settings` <br/>
 The name of settings group in your appsettings file that you want to use
 
