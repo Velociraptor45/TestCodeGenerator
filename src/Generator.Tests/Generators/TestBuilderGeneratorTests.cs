@@ -17,6 +17,7 @@ using TestCodeGenerator.MyNamespace.Folder;
 using TestCodeGenerator.MyNamespace.Folder.Sub.Sub.Inside.Another.Folder.Here;
 using TestCodeGenerator.TestTools;
 using TestCodeGenerator.TestTools.Exceptions;
+using DuplicatedClassNameTest = TestCodeGenerator.Generator.Tests.Generators.TestClasses.DuplicatedName.DuplicatedClassNameTest;
 
 namespace TestCodeGenerator.Generator.Tests.Generators;
 
@@ -436,6 +437,53 @@ public class TestBuilderGeneratorTests
             // Assert
             File.Exists(filePath).Should().BeTrue();
 
+            var fileContent = File.ReadAllText(filePath);
+            fileContent.Should().Be(expectedBuilder);
+        });
+    }
+
+    [Fact]
+    public void Generate_WithDuplicatedClassName_ShouldNotCreateFile()
+    {
+        var className = nameof(DuplicatedClassNameTest);
+        TestFolder.CreateTemp(folderPath =>
+        {
+            // Arrange
+            var filePath = Path.Combine(folderPath, $"{className}Builder.cs");
+
+            _fixture.SetupBuilderConfiguration(folderPath);
+            _fixture.SetupFileHandlerLoadingAssembly();
+            var sut = _fixture.CreateSut();
+
+            // Act
+            sut.Generate(new List<string> { className });
+
+            // Assert
+            File.Exists(filePath).Should().BeFalse();
+        });
+    }
+
+    [Fact]
+    public void Generate_WithDuplicatedClassName_WithNamespaceAddition_ShouldNotCreateFile()
+    {
+        var className = $"{nameof(DuplicatedClassNameTest)}";
+        var namespaceName = $"DuplicatedName.{className}";
+        var expectedBuilder = DuplicatedClassNameTest.GetExpectedBuilder();
+        TestFolder.CreateTemp(folderPath =>
+        {
+            // Arrange
+            var filePath = Path.Combine(folderPath, $"{className}Builder.cs");
+
+            _fixture.SetupFileNotExisting(filePath);
+            _fixture.SetupBuilderConfiguration(folderPath);
+            _fixture.SetupFileHandlerLoadingAssembly();
+            var sut = _fixture.CreateSut();
+
+            // Act
+            sut.Generate(new List<string> { namespaceName });
+
+            // Assert
+            File.Exists(filePath).Should().BeTrue();
             var fileContent = File.ReadAllText(filePath);
             fileContent.Should().Be(expectedBuilder);
         });
