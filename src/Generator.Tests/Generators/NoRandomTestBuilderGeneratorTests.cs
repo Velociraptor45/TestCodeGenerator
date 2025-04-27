@@ -46,10 +46,12 @@ public class NoRandomTestBuilderGeneratorTests
         });
     }
 
-    [Fact]
-    public void Generate_WithNoDefaultCtor_ShouldSkipClass()
+    [Theory]
+    [InlineData(typeof(ClassWithoutDefaultCtor))]
+    [InlineData(typeof(AbstractClass))]
+    public void Generate_WithNoDefaultCtor_ShouldSkipClass(Type classType)
     {
-        var className = $"{nameof(ClassWithoutDefaultCtor)}";
+        var className = classType.Name;
         TestFolder.CreateTemp(folderPath =>
         {
             // Arrange
@@ -153,4 +155,8 @@ public class ClassWithoutDefaultCtor
     public ClassWithoutDefaultCtor(int x)
     {
     }
+}
+
+public abstract class AbstractClass
+{
 }
