@@ -20,6 +20,8 @@ public class NoRandomTestBuilderGeneratorTests
         yield return [nameof(BoolPropertyNoRandomTest), BoolPropertyNoRandomTest.GetExpectedBuilder()];
         yield return [nameof(AdditionalCtorNoRandomTest), AdditionalCtorNoRandomTest.GetExpectedBuilder()];
         yield return [nameof(PrivatelySettablePropertyNoRandomTest), PrivatelySettablePropertyNoRandomTest.GetExpectedBuilder()];
+        yield return [nameof(InitPropertyNoRandomTest), InitPropertyNoRandomTest.GetExpectedBuilder()];
+        yield return [nameof(NotSetterPropertyNoRandomTest), NotSetterPropertyNoRandomTest.GetExpectedBuilder()];
     }
 
     [Theory]
