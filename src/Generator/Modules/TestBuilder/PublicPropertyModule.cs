@@ -20,6 +20,13 @@ public class PublicPropertyModule : TestBuilderModuleBase
             .GetProperties(BindingFlags.Public | BindingFlags.Instance)
             .Where(p => p.GetSetMethod() != null);
 
+        // When not using random data, the object is created at first before the properties are set
+        // Thus, we can't write to properties that don't have a public set
+        if (!Config.UseRandomData)
+            publicSetProperties = publicSetProperties.Where(p => p.SetMethod is not null
+                                                                 && p.SetMethod.IsPublic
+                                                                 && !p.SetMethod.IsInitOnly());
+
         foreach (var property in publicSetProperties)
         {
             var key = (property.Name, property.PropertyType.FullName!);
@@ -35,7 +42,12 @@ public class PublicPropertyModule : TestBuilderModuleBase
 
     protected override Statement GetWithStatement(string originalName, string withMethodParameterName)
     {
-        return new(
-            $"{Config.PropertyInjectionMethodName}(p => p.{originalName}, {originalName.LowercaseFirstLetter()});");
+        if (Config.UseRandomData)
+        {
+            return new(
+                $"{Config.PropertyInjectionMethodName}(p => p.{originalName}, {originalName.LowercaseFirstLetter()});");
+        }
+
+        return new($"_obj.{originalName} = {originalName.LowercaseFirstLetter()};");
     }
 }

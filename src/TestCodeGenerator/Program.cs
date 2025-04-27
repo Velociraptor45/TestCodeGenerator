@@ -33,11 +33,22 @@ Parser.Default.ParseArguments<CliOptions>(args)
         var classNames = o.ClassName.Split(',').Select(c => c.Trim());
 
         var config = configsMatchingName.First();
-        new TestBuilderGenerator(new FileHandler(), new CsFileHandler(), config,
-                new List<ITestBuilderModule>
-                {
-                    new CtorParameterModule(config),
-                    new PublicPropertyModule(config)
-                })
-            .Generate(classNames);
+        GetGenerator(config).Generate(classNames);
     });
+
+TestBuilderGeneratorBase GetGenerator(BuilderConfiguration config)
+{
+    if (config.UseRandomData)
+        return new RandomTestBuilderGenerator(new FileHandler(), new CsFileHandler(), config,
+            new List<ITestBuilderModule>
+            {
+                new CtorParameterModule(config),
+                new PublicPropertyModule(config)
+            });
+
+    return new NoRandomTestBuilderGenerator(new FileHandler(), new CsFileHandler(), config,
+        new List<ITestBuilderModule>
+        {
+            new PublicPropertyModule(config)
+        });
+}

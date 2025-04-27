@@ -21,9 +21,9 @@ using DuplicatedClassNameTest = TestCodeGenerator.Generator.Tests.Generators.Tes
 
 namespace TestCodeGenerator.Generator.Tests.Generators;
 
-public class TestBuilderGeneratorTests
+public class RandomTestBuilderGeneratorTests
 {
-    private readonly TestBuilderGeneratorFixture _fixture = new();
+    private readonly RandomTestBuilderGeneratorFixture _fixture = new();
 
     public static IEnumerable<object?[]> GenerateWithExistingFileTestData()
     {
@@ -489,17 +489,18 @@ public class TestBuilderGeneratorTests
         });
     }
 
-    private class TestBuilderGeneratorFixture
+
+    private class RandomTestBuilderGeneratorFixture
     {
         private readonly Mock<IFileHandler> _fileHandlerMock = new(MockBehavior.Strict);
         private BuilderConfiguration? _builderConfiguration;
         private readonly Assembly _assembly = Assembly.GetExecutingAssembly();
 
-        public TestBuilderGenerator CreateSut()
+        public RandomTestBuilderGenerator CreateSut()
         {
             TestPropertyNotSetException.ThrowIfNull(_builderConfiguration);
 
-            return new TestBuilderGenerator(_fileHandlerMock.Object, new CsFileHandler(), _builderConfiguration,
+            return new RandomTestBuilderGenerator(_fileHandlerMock.Object, new CsFileHandler(), _builderConfiguration,
                 new List<ITestBuilderModule>
                 {
                     new CtorParameterModule(_builderConfiguration),

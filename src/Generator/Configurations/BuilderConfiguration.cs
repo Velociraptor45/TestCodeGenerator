@@ -13,4 +13,5 @@ public class BuilderConfiguration
     public string? BuilderNamePattern { get; init; } = null;
     public bool NullabilityEnabled { get; init; } = true;
     public bool MatchFolderToNamespace { get; set; } = false;
+    public bool UseRandomData { get; set; } = true;
 }

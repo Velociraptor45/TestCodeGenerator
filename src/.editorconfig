@@ -255,6 +255,8 @@ dotnet_style_prefer_compound_assignment = true:suggestion
 dotnet_style_prefer_simplified_interpolation = true:suggestion
 dotnet_style_namespace_match_folder = true:suggestion
 
+# ReSharper
+resharper_convert_to_primary_constructor_highlighting=none
 
 ###### Analyzers ######
 
