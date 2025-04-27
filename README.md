@@ -30,23 +30,27 @@ You have to provide a set of settings in order to let the TestCodeGenerator know
 
 `OutputFolder`: The folder where the builder class file will be created
 
-`GenericSuperclassTypeName`: The name of the superclass that the newly created builder class should inherit from
+`GenericSuperclassTypeName`: The name of the superclass that the newly created builder class should inherit from. Optional and unused if `UseRandomData` is `false`
 
-`GenericSuperclassNamespace`: The namespace of the class specified in `GenericSuperclassTypeName`
+`GenericSuperclassNamespace`: The namespace of the class specified in `GenericSuperclassTypeName`. Optional and unused if `UseRandomData` is `false`
 
-`CtorInjectionMethodName`: The method in the superclass that is used for ctor injections
+`CtorInjectionMethodName`: The method in the superclass that is used for ctor injections. Optional and unused if `UseRandomData` is `false`
 
-`PropertyInjectionMethodName`: The method in the superclass that is used for property injections
+`PropertyInjectionMethodName`: The method in the superclass that is used for property injections. Optional and unused if `UseRandomData` is `false`
 
 `OutputAssemblyRootNamespace`: The root namespace of the assembly where the newly created builder class should be placed in
 
-(optional) `BuilderNamePattern`: The pattern with which the builder class name is generated. Use `{ClassName}` as the placeholder for the class's name for which you are generating the builder. Omit it for the default pattern `{ClassName}Builder`
+(optional) `BuilderNamePattern`: The pattern with which the builder class name is generated. Use `{ClassName}` as the placeholder for the class's name for which you are generating the builder. Default: `{ClassName}Builder`
 
 (optional) `NullabilityEnabled`: The indication whether the given class should be treated with enabled or disabled [nullability feature](https://learn.microsoft.com/en-us/dotnet/csharp/nullable-references). Default: `true`
 
 (optional) `MatchFolderToNamespace`: Place the output file in the folder path that corresponds to the builder class's namespaces, with the `OutputFolder` acting as the root. Default: `false`
 
+(optional) `UseRandomData`: Whether or not to integrate AutoFixture. If turned off, the builders will not reference any base class and need the provided type to have an empty default constructor (see [example](#without-random-data)). As the default ctor is always used for object generation, only publicly settable properties are included in the builder. Default: `true`
+
 ## Example
+
+### With random data
 Let's say you have the following model,
 
 ```c#
@@ -140,6 +144,68 @@ public class MyCoolItemBuilder : DomainTestBuilderBase<Item>
     {
         FillPropertyWith(p => p.Price, price);
         return this;
+    }
+}
+```
+
+### Without random data
+Let's say you have the following model (An empty ctor is required. You may have others, but the empty one is always the one that's used),
+
+```c#
+using System;
+
+namespace MyProject.Domain.Items.Models;
+
+public class Item
+{    
+    public double Price { get; set; }
+}
+```
+
+provide the following settings in your appsettings.json
+
+```json
+{
+  "Settings": [
+    {
+      "Name": "Domain",
+      "DllPath": "C:\\Repositories\\MyProject\\bin\\Debug\\net6.0\\MyProject.Domain.dll",
+      "OutputFolder": "C:\\OutputFolder",
+      "OutputAssemblyRootNamespace": "MyProject.Domain.TestKit",
+      "BuilderNamePattern": "MyCool{ClassName}Builder",
+      "UseRandomData": false
+    }
+  ]
+}
+```
+
+and call TestCodeGenerator with
+
+```bash
+TestCodeGenerator.exe -c Item -s Domain
+```
+
+it will generate this builder without any AutoFixture integration:
+
+```c#
+using MyProject.Domain.Items.Models;
+using System;
+
+namespace MyProject.Domain.TestKit.Items.Models;
+
+public class MyCoolItemBuilder
+{
+    private Item _obj = new();
+    
+    public MyCoolItemBuilder WithPrice(double price)
+    {
+        _obj.Price = price;
+        return this;
+    }
+
+    public Item Create()
+    {
+        return _obj;
     }
 }
 ```

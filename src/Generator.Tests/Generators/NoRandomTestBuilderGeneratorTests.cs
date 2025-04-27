@@ -19,6 +19,7 @@ public class NoRandomTestBuilderGeneratorTests
     {
         yield return [nameof(BoolPropertyNoRandomTest), BoolPropertyNoRandomTest.GetExpectedBuilder()];
         yield return [nameof(AdditionalCtorNoRandomTest), AdditionalCtorNoRandomTest.GetExpectedBuilder()];
+        yield return [nameof(PrivatelySettablePropertyNoRandomTest), PrivatelySettablePropertyNoRandomTest.GetExpectedBuilder()];
     }
 
     [Theory]
@@ -64,6 +65,33 @@ public class NoRandomTestBuilderGeneratorTests
 
             // Assert
             File.Exists(filePath).Should().BeFalse();
+        });
+    }
+
+    [Fact]
+    public void Generate_WithFileAlreadyExisting_ShouldSaveExpectedResult()
+    {
+        var className = nameof(BoolPropertyNoRandomTest);
+        var expectedBuilder = BoolPropertyNoRandomTest.GetExpectedBuilder();
+        TestFolder.CreateTemp(folderPath =>
+        {
+            // Arrange
+            var filePath = Path.Combine(folderPath, $"{className}Builder.cs");
+            File.WriteAllText(filePath, expectedBuilder);
+
+            _fixture.SetupFileExisting(filePath);
+            _fixture.SetupBuilderConfiguration(folderPath);
+            _fixture.SetupFileHandlerLoadingAssembly();
+            var sut = _fixture.CreateSut();
+
+            // Act
+            sut.Generate(new List<string> { className });
+
+            // Assert
+            File.Exists(filePath).Should().BeTrue();
+
+            var fileContent = File.ReadAllText(filePath);
+            fileContent.Should().Be(expectedBuilder);
         });
     }
 

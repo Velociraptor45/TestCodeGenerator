@@ -36,10 +36,12 @@ public class NoRandomTestBuilderGenerator : TestBuilderGeneratorBase
             file.Nmsp.AddClass(cls);
         }
 
+        RemoveAllGeneratedMethods(cls);
+        RemoveAllGeneratedFields(cls);
+
         cls.RemoveAllBaseTypes();
         cls.AddField(new Field([FieldModifier.Private], type.Name, "_obj", new("new()")));
 
-        RemoveAllGeneratedMethods(cls);
 
         foreach (var module in _modules)
         {
@@ -58,5 +60,14 @@ public class NoRandomTestBuilderGenerator : TestBuilderGeneratorBase
 
         file.OrderUsingsAsc();
         return true;
+    }
+
+
+    protected void RemoveAllGeneratedFields(Class cls)
+    {
+        foreach (var field in cls.Fields.ToList())
+        {
+            cls.RemoveField(field);
+        }
     }
 }
