@@ -1,7 +1,16 @@
 ﻿namespace TestCodeGenerator.Generator.Tests.Generators.TestClasses.NoRandomData;
 
-public class BoolPropertyNoRandomTest
+public class AdditionalCtorNoRandomTest
 {
+    public AdditionalCtorNoRandomTest()
+    {
+    }
+
+    public AdditionalCtorNoRandomTest(bool id)
+    {
+        Id = id;
+    }
+
     public bool Id { get; set; }
 
     public static string GetExpectedBuilder()
@@ -11,16 +20,16 @@ public class BoolPropertyNoRandomTest
                using TestCodeGenerator.Generator.Tests.Generators.TestClasses.NoRandomData;
 
                namespace TestCodeGenerator.Generator.Tests.Tests.Generators.TestClasses.NoRandomData;
-               public class BoolPropertyNoRandomTestBuilder
+               public class AdditionalCtorNoRandomTestBuilder
                {
-                   private BoolPropertyNoRandomTest _obj = new();
-                   public BoolPropertyNoRandomTestBuilder WithId(bool id)
+                   private AdditionalCtorNoRandomTest _obj = new();
+                   public AdditionalCtorNoRandomTestBuilder WithId(bool id)
                    {
                        _obj.Id = id;
                        return this;
                    }
-
-                   public BoolPropertyNoRandomTest Create()
+               
+                   public AdditionalCtorNoRandomTest Create()
                    {
                        return _obj;
                    }

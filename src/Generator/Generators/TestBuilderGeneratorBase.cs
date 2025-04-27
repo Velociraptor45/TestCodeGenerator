@@ -37,8 +37,6 @@ public abstract class TestBuilderGeneratorBase
 
             Console.WriteLine($"Starting code generation for {typeName}");
 
-            var usings = new Usings { Config.GenericSuperclassNamespace, type.Namespace! };
-
             var builderClassName = GenerateBuilderClassName(type);
 
             var namespaceInfo = new NamespaceInfo(type, Config.OutputAssemblyRootNamespace);
@@ -51,7 +49,13 @@ public abstract class TestBuilderGeneratorBase
                     ?? new CsFile([], new Namespace(namespaceInfo.BuilderClassNamespace))
                 : new CsFile([], new Namespace(namespaceInfo.BuilderClassNamespace));
 
-            UpdateFile(file, type, usings, builderClassName);
+            var success = UpdateFile(file, type, builderClassName);
+            if (!success)
+            {
+                Console.WriteLine($"Code generation for {typeName} failed");
+                continue;
+            }
+
             _csFileHandler.SaveOrReplace(file, builderFilePath);
             Console.WriteLine($"Code generation for {typeName} completed");
         }
@@ -81,7 +85,19 @@ public abstract class TestBuilderGeneratorBase
         return types.Single();
     }
 
-    protected abstract void UpdateFile(CsFile file, Type type, Usings usings, string builderClassName);
+    protected abstract bool UpdateFile(CsFile file, Type type, string builderClassName);
+
+    protected void RemoveAllGeneratedMethods(Class cls)
+    {
+        var methodsToRemove = cls.Methods
+            .Where(m => !m.LeadingComments.Any(c => c.Value.ToLower().Contains("tcg keep")))
+            .ToArray();
+
+        foreach (var method in methodsToRemove)
+        {
+            cls.RemoveMethod(method);
+        }
+    }
 
     private string GenerateBuilderClassName(Type type)
     {

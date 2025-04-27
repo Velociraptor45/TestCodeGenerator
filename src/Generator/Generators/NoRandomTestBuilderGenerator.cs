@@ -1,5 +1,7 @@
 ﻿using RefleCS;
+using RefleCS.Enums;
 using RefleCS.Nodes;
+using TestCodeGenerator.Generator.Common;
 using TestCodeGenerator.Generator.Configurations;
 using TestCodeGenerator.Generator.Files;
 using TestCodeGenerator.Generator.Models;
@@ -7,21 +9,25 @@ using TestCodeGenerator.Generator.Modules.TestBuilder;
 
 namespace TestCodeGenerator.Generator.Generators;
 
-public class RandomTestBuilderGenerator : TestBuilderGeneratorBase
+public class NoRandomTestBuilderGenerator : TestBuilderGeneratorBase
 {
     private readonly List<ITestBuilderModule> _modules;
 
-    public RandomTestBuilderGenerator(IFileHandler fileHandler, ICsFileHandler csFileHandler,
+    public NoRandomTestBuilderGenerator(IFileHandler fileHandler, ICsFileHandler csFileHandler,
         BuilderConfiguration config, IEnumerable<ITestBuilderModule> modules) : base(fileHandler, csFileHandler, config)
     {
         _modules = modules.ToList();
     }
 
-
     protected override bool UpdateFile(CsFile file, Type type, string builderClassName)
     {
-        var usings = new Usings { Config.GenericSuperclassNamespace, type.Namespace! };
+        if (type.GetConstructors().All(c => c.GetParameters().Length != 0))
+        {
+            Output.WriteError($"Type '{type.Name}' does not have a parameterless constructor. Cannot generate builder without random data.");
+            return false;
+        }
 
+        var usings = new Usings { type.Namespace! };
         var cls = file.Nmsp.Classes.FirstOrDefault(c => c.Name == builderClassName);
 
         if (cls is null)
@@ -31,7 +37,7 @@ public class RandomTestBuilderGenerator : TestBuilderGeneratorBase
         }
 
         cls.RemoveAllBaseTypes();
-        cls.AddBaseType(new BaseType($"{Config.GenericSuperclassTypeName}<{type.Name}>"));
+        cls.AddField(new Field([FieldModifier.Private], type.Name, "_obj", new("new()")));
 
         RemoveAllGeneratedMethods(cls);
 
@@ -39,6 +45,11 @@ public class RandomTestBuilderGenerator : TestBuilderGeneratorBase
         {
             module.Apply(type, builderClassName, cls, usings);
         }
+
+        var createMethod = new Method(type.Name, "Create")
+            .AddStatement(new Statement("return _obj;"))
+            .AddModifier(MethodModifier.Public);
+        cls.AddMethod(createMethod);
 
         foreach (var @using in usings)
         {

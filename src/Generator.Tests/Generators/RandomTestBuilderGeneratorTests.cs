@@ -23,7 +23,7 @@ namespace TestCodeGenerator.Generator.Tests.Generators;
 
 public class RandomTestBuilderGeneratorTests
 {
-    private readonly TestBuilderGeneratorFixture _fixture = new();
+    private readonly RandomTestBuilderGeneratorFixture _fixture = new();
 
     public static IEnumerable<object?[]> GenerateWithExistingFileTestData()
     {
@@ -489,32 +489,8 @@ public class RandomTestBuilderGeneratorTests
         });
     }
 
-    //[Fact]
-    //public void Generate_WithNoRandomData_ShouldSaveExpectedResult()
-    //{
-    //    var className = $"{nameof(BoolPropertyNoRandomTest)}";
-    //    var expectedBuilder = BoolPropertyNoRandomTest.GetExpectedBuilder();
-    //    TestFolder.CreateTemp(folderPath =>
-    //    {
-    //        // Arrange
-    //        var filePath = Path.Combine(folderPath, $"{className}Builder.cs");
 
-    //        _fixture.SetupFileNotExisting(filePath);
-    //        _fixture.SetupBuilderConfigurationForNoRandomData(folderPath);
-    //        _fixture.SetupFileHandlerLoadingAssembly();
-    //        var sut = _fixture.CreateSut();
-
-    //        // Act
-    //        sut.Generate(new List<string> { className });
-
-    //        // Assert
-    //        File.Exists(filePath).Should().BeTrue();
-    //        var fileContent = File.ReadAllText(filePath);
-    //        fileContent.Should().Be(expectedBuilder);
-    //    });
-    //}
-
-    private class TestBuilderGeneratorFixture
+    private class RandomTestBuilderGeneratorFixture
     {
         private readonly Mock<IFileHandler> _fileHandlerMock = new(MockBehavior.Strict);
         private BuilderConfiguration? _builderConfiguration;
@@ -547,21 +523,6 @@ public class RandomTestBuilderGeneratorTests
                 BuilderNamePattern = builderNamePattern,
                 NullabilityEnabled = nullabilityEnabled,
                 MatchFolderToNamespace = matchFolderToNamespace
-            };
-        }
-
-        public void SetupBuilderConfigurationForNoRandomData(string outputFolder, string? builderNamePattern = null,
-            bool nullabilityEnabled = true, bool matchFolderToNamespace = false)
-        {
-            _builderConfiguration = new BuilderConfiguration
-            {
-                DllPath = "test.Path.dll",
-                OutputFolder = outputFolder,
-                OutputAssemblyRootNamespace = "TestCodeGenerator.Generator.Tests.Tests",
-                BuilderNamePattern = builderNamePattern,
-                NullabilityEnabled = nullabilityEnabled,
-                MatchFolderToNamespace = matchFolderToNamespace,
-                UseRandomData = false
             };
         }
 
