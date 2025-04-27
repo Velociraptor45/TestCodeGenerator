@@ -35,7 +35,12 @@ public class PublicPropertyModule : TestBuilderModuleBase
 
     protected override Statement GetWithStatement(string originalName, string withMethodParameterName)
     {
-        return new(
-            $"{Config.PropertyInjectionMethodName}(p => p.{originalName}, {originalName.LowercaseFirstLetter()});");
+        if (Config.UseRandomData)
+        {
+            return new(
+                $"{Config.PropertyInjectionMethodName}(p => p.{originalName}, {originalName.LowercaseFirstLetter()});");
+        }
+
+        return new($"_obj.{originalName} = {originalName.LowercaseFirstLetter()};");
     }
 }
