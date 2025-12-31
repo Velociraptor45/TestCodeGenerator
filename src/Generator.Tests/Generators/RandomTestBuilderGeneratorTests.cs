@@ -27,243 +27,243 @@ public class RandomTestBuilderGeneratorTests
 
     public static IEnumerable<object?[]> GenerateWithExistingFileTestData()
     {
-        yield return new object[]
-        {
+        yield return
+        [
             nameof(ExistingFileTest),
             ExistingFileTest.GetExpectedBuilder(),
             ExistingFileTest.GetExistingBuilder()
-        };
-        yield return new object[]
-        {
+        ];
+        yield return
+        [
             nameof(ExistingFileWithMethodToKeepTest),
             ExistingFileWithMethodToKeepTest.GetExpectedBuilder(),
             ExistingFileWithMethodToKeepTest.GetExistingBuilder()
-        };
+        ];
     }
 
     public static IEnumerable<object?[]> GenerateWithBuilderNameCustomizationTestData()
     {
-        yield return new object[]
-        {
+        yield return
+        [
             nameof(WithClassNamePatternTest),
             WithClassNamePatternTest.GetExpectedBuilder(),
             WithClassNamePatternTest.GetBuilderNamePattern(),
             WithClassNamePatternTest.GetFileName()
-        };
-        yield return new object?[]
-        {
+        ];
+        yield return
+        [
             nameof(WithoutClassNamePatternTest),
             WithoutClassNamePatternTest.GetExpectedBuilder(),
             WithoutClassNamePatternTest.GetBuilderNamePattern(),
             WithoutClassNamePatternTest.GetFileName()
-        };
-        yield return new object[]
-        {
+        ];
+        yield return
+        [
             nameof(WithStaticClassNamePatternTest),
             WithStaticClassNamePatternTest.GetExpectedBuilder(),
             WithStaticClassNamePatternTest.GetBuilderNamePattern(),
             WithStaticClassNamePatternTest.GetFileName()
-        };
+        ];
     }
 
     public static IEnumerable<object?[]> GenerateWithoutNullabilityTestData()
     {
-        yield return new object[]
-        {
+        yield return
+        [
             nameof(ClassParameterTest),
-            ClassParameterTest.GetExpectedBuilder(),
-        };
-        yield return new object[]
-        {
+            ClassParameterTest.GetExpectedBuilder()
+        ];
+        yield return
+        [
             nameof(StructParameterTest),
-            StructParameterTest.GetExpectedBuilder(),
-        };
-        yield return new object[]
-        {
+            StructParameterTest.GetExpectedBuilder()
+        ];
+        yield return
+        [
             nameof(NullableStructParameterTest),
-            NullableStructParameterTest.GetExpectedBuilder(),
-        };
-        yield return new object[]
-        {
+            NullableStructParameterTest.GetExpectedBuilder()
+        ];
+        yield return
+        [
             nameof(IntParameterForNullabilityTest),
-            IntParameterForNullabilityTest.GetExpectedBuilder(),
-        };
-        yield return new object[]
-        {
+            IntParameterForNullabilityTest.GetExpectedBuilder()
+        ];
+        yield return
+        [
             nameof(NullableIntParameterForNullabilityTest),
-            NullableIntParameterForNullabilityTest.GetExpectedBuilder(),
-        };
+            NullableIntParameterForNullabilityTest.GetExpectedBuilder()
+        ];
     }
 
     public static IEnumerable<object[]> GenerateTestData()
     {
         // Ctor
-        yield return new object[] { nameof(IntParameterTest), IntParameterTest.GetExpectedBuilder() };
-        yield return new object[] { nameof(NullableIntParameterTest), NullableIntParameterTest.GetExpectedBuilder() };
-        yield return new object[] { nameof(BoolParameterTest), BoolParameterTest.GetExpectedBuilder() };
-        yield return new object[] { nameof(NullableEnumerableParameterTest), NullableEnumerableParameterTest.GetExpectedBuilder() };
-        yield return new object[]
-        {
+        yield return [nameof(IntParameterTest), IntParameterTest.GetExpectedBuilder()];
+        yield return [nameof(NullableIntParameterTest), NullableIntParameterTest.GetExpectedBuilder()];
+        yield return [nameof(BoolParameterTest), BoolParameterTest.GetExpectedBuilder()];
+        yield return [nameof(NullableEnumerableParameterTest), NullableEnumerableParameterTest.GetExpectedBuilder()];
+        yield return
+        [
             nameof(NullableEnumerableWithNullableArgParameterTest), NullableEnumerableWithNullableArgParameterTest.GetExpectedBuilder()
-        };
-        yield return new object[] { nameof(ListParameterTest), ListParameterTest.GetExpectedBuilder() };
-        yield return new object[] { nameof(DictionaryParameterTest), DictionaryParameterTest.GetExpectedBuilder() };
-        yield return new object[] { nameof(EnumerableParameterTest), EnumerableParameterTest.GetExpectedBuilder() };
-        yield return new object[] { nameof(IListParameterTest), IListParameterTest.GetExpectedBuilder() };
-        yield return new object[] { nameof(IDictionaryParameterTest), IDictionaryParameterTest.GetExpectedBuilder() };
-        yield return new object[] { nameof(ICollectionParameterTest), ICollectionParameterTest.GetExpectedBuilder() };
-        yield return new object[] { nameof(IReadOnlyCollectionParameterTest), IReadOnlyCollectionParameterTest.GetExpectedBuilder() };
-        yield return new object[] { nameof(ArrayParameterTest), ArrayParameterTest.GetExpectedBuilder() };
-        yield return new object[] { nameof(ArrayInArrayParameterTest), ArrayInArrayParameterTest.GetExpectedBuilder() };
-        yield return new object[]
-        {
+        ];
+        yield return [nameof(ListParameterTest), ListParameterTest.GetExpectedBuilder()];
+        yield return [nameof(DictionaryParameterTest), DictionaryParameterTest.GetExpectedBuilder()];
+        yield return [nameof(EnumerableParameterTest), EnumerableParameterTest.GetExpectedBuilder()];
+        yield return [nameof(IListParameterTest), IListParameterTest.GetExpectedBuilder()];
+        yield return [nameof(IDictionaryParameterTest), IDictionaryParameterTest.GetExpectedBuilder()];
+        yield return [nameof(ICollectionParameterTest), ICollectionParameterTest.GetExpectedBuilder()];
+        yield return [nameof(IReadOnlyCollectionParameterTest), IReadOnlyCollectionParameterTest.GetExpectedBuilder()];
+        yield return [nameof(ArrayParameterTest), ArrayParameterTest.GetExpectedBuilder()];
+        yield return [nameof(ArrayInArrayParameterTest), ArrayInArrayParameterTest.GetExpectedBuilder()];
+        yield return
+        [
             nameof(InheritFromIEnumerableWithStandardCtorParameterTest),
             InheritFromIEnumerableWithStandardCtorParameterTest.GetExpectedBuilder()
-        };
-        yield return new object[]
-        {
+        ];
+        yield return
+        [
             nameof(InheritFromIEnumerableWithoutStandardCtorParameterTest),
             InheritFromIEnumerableWithoutStandardCtorParameterTest.GetExpectedBuilder()
-        };
-        yield return new object[] { nameof(NullableDictionaryParameterTest), NullableDictionaryParameterTest.GetExpectedBuilder() };
-        yield return new object[]
-        {
+        ];
+        yield return [nameof(NullableDictionaryParameterTest), NullableDictionaryParameterTest.GetExpectedBuilder()];
+        yield return
+        [
             nameof(NullableDictionaryWithSecondArgNullableParameterTest),
             NullableDictionaryWithSecondArgNullableParameterTest.GetExpectedBuilder()
-        };
-        yield return new object[] { nameof(SingleGenericParameterTest), SingleGenericParameterTest.GetExpectedBuilder() };
-        yield return new object[] { nameof(DoubleGenericParameterTest), DoubleGenericParameterTest.GetExpectedBuilder() };
-        yield return new object[]
-        {
+        ];
+        yield return [nameof(SingleGenericParameterTest), SingleGenericParameterTest.GetExpectedBuilder()];
+        yield return [nameof(DoubleGenericParameterTest), DoubleGenericParameterTest.GetExpectedBuilder()];
+        yield return
+        [
             nameof(NullableEnumerableInEnumerableParameterTest), NullableEnumerableInEnumerableParameterTest.GetExpectedBuilder()
-        };
-        yield return new object[]
-        {
+        ];
+        yield return
+        [
             nameof(EnumerableInEnumerableParameterTest), EnumerableInEnumerableParameterTest.GetExpectedBuilder()
-        };
-        yield return new object[] { nameof(ListInEnumerableParameterTest), ListInEnumerableParameterTest.GetExpectedBuilder() };
-        yield return new object[] { nameof(EnumerableInListParameterTest), EnumerableInListParameterTest.GetExpectedBuilder() };
-        yield return new object[]
-        {
+        ];
+        yield return [nameof(ListInEnumerableParameterTest), ListInEnumerableParameterTest.GetExpectedBuilder()];
+        yield return [nameof(EnumerableInListParameterTest), EnumerableInListParameterTest.GetExpectedBuilder()];
+        yield return
+        [
             nameof(DoubleGenericInEnumerableParameterTest), DoubleGenericInEnumerableParameterTest.GetExpectedBuilder()
-        };
-        yield return new object[]
-        {
+        ];
+        yield return
+        [
             nameof(SingleGenericInDoubleGenericParameterTest), SingleGenericInDoubleGenericParameterTest.GetExpectedBuilder()
-        };
-        yield return new object[]
-        {
+        ];
+        yield return
+        [
             nameof(DuplicatedCtorParametersTest), DuplicatedCtorParametersTest.GetExpectedBuilder()
-        };
-        yield return new object[]
-        {
+        ];
+        yield return
+        [
             nameof(DuplicatedCtorParameterTypesTest), DuplicatedCtorParameterTypesTest.GetExpectedBuilder()
-        };
+        ];
 
         // property
-        yield return new object[] { nameof(IntPropertyTest), IntPropertyTest.GetExpectedBuilder() };
-        yield return new object[] { nameof(NullableIntPropertyTest), NullableIntPropertyTest.GetExpectedBuilder() };
-        yield return new object[] { nameof(BoolPropertyTest), BoolPropertyTest.GetExpectedBuilder() };
-        yield return new object[] { nameof(NullableEnumerablePropertyTest), NullableEnumerablePropertyTest.GetExpectedBuilder() };
-        yield return new object[]
-        {
+        yield return [nameof(IntPropertyTest), IntPropertyTest.GetExpectedBuilder()];
+        yield return [nameof(NullableIntPropertyTest), NullableIntPropertyTest.GetExpectedBuilder()];
+        yield return [nameof(BoolPropertyTest), BoolPropertyTest.GetExpectedBuilder()];
+        yield return [nameof(NullableEnumerablePropertyTest), NullableEnumerablePropertyTest.GetExpectedBuilder()];
+        yield return
+        [
             nameof(NullableEnumerableWithNullableArgPropertyTest), NullableEnumerableWithNullableArgPropertyTest.GetExpectedBuilder()
-        };
-        yield return new object[] { nameof(ListPropertyTest), ListPropertyTest.GetExpectedBuilder() };
-        yield return new object[] { nameof(DictionaryPropertyTest), DictionaryPropertyTest.GetExpectedBuilder() };
-        yield return new object[] { nameof(EnumerablePropertyTest), EnumerablePropertyTest.GetExpectedBuilder() };
-        yield return new object[]
-        {
+        ];
+        yield return [nameof(ListPropertyTest), ListPropertyTest.GetExpectedBuilder()];
+        yield return [nameof(DictionaryPropertyTest), DictionaryPropertyTest.GetExpectedBuilder()];
+        yield return [nameof(EnumerablePropertyTest), EnumerablePropertyTest.GetExpectedBuilder()];
+        yield return
+        [
             nameof(InheritFromIEnumerableWithStandardCtorPropertyTest),
             InheritFromIEnumerableWithStandardCtorPropertyTest.GetExpectedBuilder()
-        };
-        yield return new object[]
-        {
+        ];
+        yield return
+        [
             nameof(InheritFromIEnumerableWithoutStandardCtorPropertyTest),
             InheritFromIEnumerableWithoutStandardCtorPropertyTest.GetExpectedBuilder()
-        };
-        yield return new object[] { nameof(NullableDictionaryPropertyTest), NullableDictionaryPropertyTest.GetExpectedBuilder() };
-        yield return new object[]
-        {
+        ];
+        yield return [nameof(NullableDictionaryPropertyTest), NullableDictionaryPropertyTest.GetExpectedBuilder()];
+        yield return
+        [
             nameof(NullableDictionaryWithSecondArgNullablePropertyTest),
             NullableDictionaryWithSecondArgNullablePropertyTest.GetExpectedBuilder()
-        };
-        yield return new object[] { nameof(SingleGenericPropertyTest), SingleGenericPropertyTest.GetExpectedBuilder() };
-        yield return new object[] { nameof(DoubleGenericPropertyTest), DoubleGenericPropertyTest.GetExpectedBuilder() };
-        yield return new object[]
-        {
+        ];
+        yield return [nameof(SingleGenericPropertyTest), SingleGenericPropertyTest.GetExpectedBuilder()];
+        yield return [nameof(DoubleGenericPropertyTest), DoubleGenericPropertyTest.GetExpectedBuilder()];
+        yield return
+        [
             nameof(NullableEnumerableInEnumerablePropertyTest), NullableEnumerableInEnumerablePropertyTest.GetExpectedBuilder()
-        };
-        yield return new object[]
-        {
+        ];
+        yield return
+        [
             nameof(EnumerableInEnumerablePropertyTest), EnumerableInEnumerablePropertyTest.GetExpectedBuilder()
-        };
-        yield return new object[] { nameof(ListInEnumerablePropertyTest), ListInEnumerablePropertyTest.GetExpectedBuilder() };
-        yield return new object[] { nameof(EnumerableInListPropertyTest), EnumerableInListPropertyTest.GetExpectedBuilder() };
-        yield return new object[]
-        {
+        ];
+        yield return [nameof(ListInEnumerablePropertyTest), ListInEnumerablePropertyTest.GetExpectedBuilder()];
+        yield return [nameof(EnumerableInListPropertyTest), EnumerableInListPropertyTest.GetExpectedBuilder()];
+        yield return
+        [
             nameof(DoubleGenericInEnumerablePropertyTest), DoubleGenericInEnumerablePropertyTest.GetExpectedBuilder()
-        };
-        yield return new object[]
-        {
+        ];
+        yield return
+        [
             nameof(SingleGenericInDoubleGenericPropertyTest), SingleGenericInDoubleGenericPropertyTest.GetExpectedBuilder()
-        };
-        yield return new object[]
-        {
+        ];
+        yield return
+        [
             nameof(DuplicatedCtorParametersTest), DuplicatedCtorParametersTest.GetExpectedBuilder()
-        };
-        yield return new object[]
-        {
+        ];
+        yield return
+        [
             nameof(DuplicatedCtorParameterTypesTest), DuplicatedCtorParameterTypesTest.GetExpectedBuilder()
-        };
-        yield return new object[]
-        {
+        ];
+        yield return
+        [
             nameof(PrivatePropertyTest), PrivatePropertyTest.GetExpectedBuilder()
-        };
-        yield return new object[]
-        {
+        ];
+        yield return
+        [
             nameof(GetOnlyPropertyTest), GetOnlyPropertyTest.GetExpectedBuilder()
-        };
-        yield return new object[]
-        {
+        ];
+        yield return
+        [
             nameof(PrivateSetPropertyTest), PrivateSetPropertyTest.GetExpectedBuilder()
-        };
+        ];
 
         // record
-        yield return new object[]
-        {
+        yield return
+        [
             nameof(RecordOnlyParameterTest), RecordOnlyParameterTest.GetExpectedBuilder()
-        };
-        yield return new object[]
-        {
+        ];
+        yield return
+        [
             nameof(RecordWithAdditionalPropertyTest), RecordWithAdditionalPropertyTest.GetExpectedBuilder()
-        };
-        yield return new object[]
-        {
+        ];
+        yield return
+        [
             nameof(RecordWithAdditionalCtorTest), RecordWithAdditionalCtorTest.GetExpectedBuilder()
-        };
+        ];
 
         // namespaces
-        yield return new object[]
-        {
+        yield return
+        [
             nameof(DifferentNamespaceTest), DifferentNamespaceTest.GetExpectedBuilder()
-        };
-        yield return new object[]
-        {
+        ];
+        yield return
+        [
             nameof(PartiallyDifferentNamespaceTest), PartiallyDifferentNamespaceTest.GetExpectedBuilder()
-        };
-        yield return new object[]
-        {
+        ];
+        yield return
+        [
             nameof(NamespaceLongerThanConfigTest), NamespaceLongerThanConfigTest.GetExpectedBuilder()
-        };
-        yield return new object[]
-        {
+        ];
+        yield return
+        [
             nameof(NamespaceSubsetOfConfigTest), NamespaceSubsetOfConfigTest.GetExpectedBuilder()
-        };
-        yield return new object[]
-        {
+        ];
+        yield return
+        [
             nameof(NamespaceSameAsConfigTest), NamespaceSameAsConfigTest.GetExpectedBuilder()
-        };
+        ];
     }
 
     [Theory]
