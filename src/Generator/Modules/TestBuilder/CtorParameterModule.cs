@@ -19,10 +19,7 @@ public class CtorParameterModule : TestBuilderModuleBase
         foreach (var parameter in allCtorParameters)
         {
             var key = (parameter.Name!, parameter.ParameterType.FullName!);
-            if (parameters.ContainsKey(key))
-                continue;
-
-            parameters.Add(key, parameter);
+            parameters.TryAdd(key, parameter);
         }
 
         foreach (var info in parameters.Values)

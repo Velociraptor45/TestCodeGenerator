@@ -14,7 +14,7 @@ public record RecordOnlyParameterTest(int? Id)
             {
                 public RecordOnlyParameterTestBuilder WithId(int? id)
                 {
-                    FillConstructorWith("Id", id);
+                    FillPropertyWith(p => p.Id, id);
                     return this;
                 }
 

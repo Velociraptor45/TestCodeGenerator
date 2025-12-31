@@ -503,8 +503,8 @@ public class RandomTestBuilderGeneratorTests
             return new RandomTestBuilderGenerator(_fileHandlerMock.Object, new CsFileHandler(), _builderConfiguration,
                 new List<ITestBuilderModule>
                 {
-                    new CtorParameterModule(_builderConfiguration),
-                    new PublicPropertyModule(_builderConfiguration)
+                    new PublicPropertyModule(_builderConfiguration),
+                    new CtorParameterModule(_builderConfiguration)
                 });
         }
 

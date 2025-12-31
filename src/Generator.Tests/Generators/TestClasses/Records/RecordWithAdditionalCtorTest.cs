@@ -21,7 +21,7 @@ public record RecordWithAdditionalCtorTest(int? Id)
             {
                 public RecordWithAdditionalCtorTestBuilder WithId(int? id)
                 {
-                    FillConstructorWith("Id", id);
+                    FillPropertyWith(p => p.Id, id);
                     return this;
                 }
 
