@@ -42,8 +42,8 @@ TestBuilderGeneratorBase GetGenerator(BuilderConfiguration config)
         return new RandomTestBuilderGenerator(new FileHandler(), new CsFileHandler(), config,
             new List<ITestBuilderModule>
             {
-                new CtorParameterModule(config),
-                new PublicPropertyModule(config)
+                new PublicPropertyModule(config),
+                new CtorParameterModule(config)
             });
 
     return new NoRandomTestBuilderGenerator(new FileHandler(), new CsFileHandler(), config,

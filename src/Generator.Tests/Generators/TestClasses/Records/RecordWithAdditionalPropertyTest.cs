@@ -16,7 +16,7 @@ public record RecordWithAdditionalPropertyTest(int? Id)
             {
                 public RecordWithAdditionalPropertyTestBuilder WithId(int? id)
                 {
-                    FillConstructorWith("Id", id);
+                    FillPropertyWith(p => p.Id, id);
                     return this;
                 }
 

@@ -3,6 +3,8 @@ bin/
 obj/
 [Ss]sl/
 
+*/.idea/*
+
 *.user
 
 *.pfx
